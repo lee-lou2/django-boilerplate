@@ -1,0 +1,7 @@
+import django_filters
+
+from app.{{ app_name }}.models import {{ camel_case_app_name }}
+
+
+class {{ camel_case_app_name }}Filter(django_filters.FilterSet):
+    pass

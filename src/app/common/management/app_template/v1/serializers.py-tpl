@@ -1,0 +1,23 @@
+from rest_framework import serializers
+
+from app.{{ app_name }}.models import {{ camel_case_app_name }}
+
+
+class {{ camel_case_app_name }}Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = {{ camel_case_app_name }}
+        fields = [
+            "pk",
+        ]
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        return attrs
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        return instance
+
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        return instance

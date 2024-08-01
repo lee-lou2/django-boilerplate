@@ -1,0 +1,8 @@
+<form method="post" id="social_login_form">
+  {% csrf_token %}
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('social_login_form').submit();
+    });
+</script>

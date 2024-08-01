@@ -1,0 +1,29 @@
+{% extends "account/base.html" %}
+{% load socialaccount %}
+
+{% block content %}
+<div class="container login-container">
+    <div>
+        <h1>로그인</h1>
+        <div class="sub-title">원하시는 서비스를 선택해주세요</div>
+        <div class="horizontal-line"></div>
+        <div>
+            <form id="login_form" method="post" action="{% url 'account_login' %}">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                {{ form.login }}
+                {{ form.password }}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+                <button type="submit" class="login-border">로그인</button>
+            </form>
+        </div>
+        <div class="horizontal-line"></div>
+        <div class="text-center text-decoration-none">
+            <a href="{% url 'account_signup' %}" class="signup-border">회원가입</a>
+            <span class="vertical-line"> | </span>
+            <a href="{% url 'account_reset_password' %}" class="find-password-border">아이디/패스워드 찾기</a>
+        </div>
+        <div class="horizontal-line"></div>
+    </div>
+</div>
+{% endblock %}

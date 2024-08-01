@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --text-favicon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-weight='bold' fill='%23000000'>J</text></svg>";
+        }
+        body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding-bottom: 100px;
+        }
+        .login-border {
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 350px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .horizontal-line {
+            width: 100%;
+            height: 1px;
+            background-color: #cccccc;
+            margin: 20px 0;
+        }
+        h1 {
+            font-weight: 900;
+        }
+        .text-decoration-none a {
+            color: #000000;
+            text-decoration: none;
+        }
+        .container > div {
+            width: 100%;
+            max-width: 350px;
+        }
+        .sub-title {
+            /*글자색 밝은 회색*/
+            color: #979797;
+        }
+        #login_form p {
+            margin: 0;
+        }
+        #id_login {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            border: 1px solid #cccccc;
+            margin-bottom: 8px;
+            padding: 0 15px;
+        {#    텍스트 굵기 일반으로 #}
+            font-weight: normal;
+        }
+        #id_login:focus {
+            outline: none;
+            border: 1px solid #1ec800;
+        }
+        #id_password {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            border: 1px solid #cccccc;
+            margin-bottom: 15px;
+            padding: 0 15px;
+        }
+        #id_password:focus {
+            outline: none;
+            border: 1px solid #1ec800;
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-weight='bold' fill='%23000000'>J</text></svg>">
+</head>
+<body>
+    {% block content %}
+    {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
