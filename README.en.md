@@ -106,22 +106,6 @@ Detailed documentation is provided for each feature. Documentation is available 
 - [Server Deployment Guide](./docs/en/deploy/deployment.md) (Coming soon)
 - [CI/CD Pipeline](./docs/en/deploy/ci-cd.md) (Coming soon)
 
-## 🏗️ Architecture
-
-```mermaid
-graph TD
-    Client[Client] --> |HTTP/WS| NGINX
-    NGINX --> |Proxy| API[Django API]
-    NGINX --> |Static Files| Static[Static Files Server]
-    API --> |Queries| DB[(PostgreSQL)]
-    API --> |Cache| Redis[(Redis)]
-    API --> |Search| ES[(Elasticsearch)]
-    API --> |Tasks| TaskQueue[Task Queue]
-    TaskQueue --> Celery[Celery Workers]
-    Celery --> |Email| EmailService[Email Service]
-    Celery --> |Push| PushService[Push Notification]
-    Celery --> |File Processing| Storage[(S3 Storage)]
-```
 
 ## 📂 Project Structure
 
