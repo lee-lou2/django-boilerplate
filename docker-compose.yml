@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  db:
+    hostname: postgres
+    image: postgres:latest
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    expose:
+      - "5432"
+    restart: unless-stopped
+
+  redis:
+    hostname: redis
+    image: redis:latest
+    container_name: redis_cache
+    volumes:
+      - redis_data:/data
+    expose:
+      - "6379"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: django_web
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn conf.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - ./src:/app
+    environment:
+      DJANGO_SETTINGS_MODULE: conf.settings.develop
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    container_name: celery_worker
+    volumes:
+      - ./src:/app
+    environment:
+      DJANGO_SETTINGS_MODULE: conf.settings.develop
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

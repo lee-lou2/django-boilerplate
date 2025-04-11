@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Open Graph 태그 -->
+    {% if og_tag %}
+        {% for key, value in og_tag.items %}
+            <meta property="{{ key }}" content="{{ value }}">
+        {% endfor %}
+    {% endif %}
+</head>
+
+<body>
+<script>
+    window.onload = function () {
+        const default_fallback_url = '{{ default_fallback_url }}';
+        const deeplink_ios = '{{ ios_deep_link }}';
+        const fallback_url_ios = '{{ ios_fallback_url }}' || default_fallback_url;
+        const deeplink_android = '{{ android_deep_link }}';
+        const fallback_url_android = '{{ android_fallback_url }}' || default_fallback_url;
+
+        function isAndroid() {
+            return /Android/i.test(navigator.userAgent);
+        }
+
+        function isiOS() {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        }
+
+        if (isAndroid()) {
+            if (deeplink_android) {
+                // Attempt Android deeplink
+                window.location.href = deeplink_android;
+                setTimeout(function () {
+                    // If the app is not installed, redirect to fallback URL
+                    window.location.href = fallback_url_android;
+                }, 2000);
+            } else {
+                // If no Android deeplink, redirect directly to fallback URL
+                window.location.href = fallback_url_android;
+            }
+        } else if (isiOS()) {
+            if (deeplink_ios) {
+                // Attempt iOS deeplink
+                window.location.href = deeplink_ios;
+                setTimeout(function () {
+                    // If the app is not installed, redirect to fallback URL
+                    window.location.href = fallback_url_ios;
+                }, 2000);
+            } else {
+                // If no iOS deeplink, redirect directly to fallback URL
+                window.location.href = fallback_url_ios;
+            }
+        } else {
+            // If not iOS or Android, redirect to the default fallback URL
+            window.location.href = default_fallback_url;
+        }
+    }
+</script>
+</body>
+
+</html>

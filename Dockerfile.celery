@@ -1,0 +1,36 @@
+# 1단계: 베이스 이미지 설정
+FROM python:3.12-slim
+
+# 2단계: 환경 변수 설정
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# 3단계: 작업 디렉토리 설정
+WORKDIR /app
+
+# 4단계: 의존성 설치 준비
+COPY requirements.txt .
+
+# 5단계: 시스템 및 Python 의존성 설치
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        gcc \
+        libpq-dev \
+        libpq5 \
+    && pip install --upgrade pip && \
+       pip install --no-cache-dir -r requirements.txt && \
+    apt-get purge -y --auto-remove build-essential gcc libpq-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 6단계: 애플리케이션 코드 복사
+COPY src .
+
+# 7단계: 보안 강화를 위해 non-root 사용자 생성 및 사용
+RUN addgroup --system app && adduser --system --ingroup app app
+RUN chown -R app:app /app
+USER app
+
+# 8단계: Celery 워커 실행 명령
+CMD ["celery", "-A", "conf", "worker", "--loglevel=info", "--concurrency=1", "--pool=solo"]

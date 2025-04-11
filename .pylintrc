@@ -1,0 +1,60 @@
+[MASTER]
+# 검사에서 무시할 디렉토리 및 파일 지정
+ignore=migrations, static, templates, venv, __pycache__, manage.py
+
+# Django 프로젝트와의 통합을 위한 플러그인 로드
+load-plugins=pylint_django
+
+# pylint 실행 시 Django 설정을 초기화하는 코드
+init-hook='import os; os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ezl_app_server.settings.local"); import django; django.setup()'
+
+# pylint의 캐시 기능 활성화 및 캐시 크기 설정
+persistent=yes
+cache-size=256
+
+[MESSAGES CONTROL]
+# 비활성화할 메시지 유형 (예: R0903 - 너무 단순한 클래스)
+disable=
+    R0903,
+
+[FORMAT]
+# 한 줄의 최대 길이 설정
+max-line-length=88
+
+# 코드의 들여쓰기 스타일 설정 (공백 4칸)
+indent-string='    '
+
+[DESIGN]
+# 함수의 최대 인자 수
+max-args=5
+
+# 클래스의 최대 속성 수
+max-attributes=10
+
+# 최대 분기 수 (복잡도 측정)
+max-branches=12
+
+# 함수 내 최대 명령문 수
+max-statements=50
+
+[TYPECHECK]
+# 타입 검사를 무시할 Django의 동적 속성
+generated-members=
+    django.conf.settings.*,
+    django.urls.*,
+    django.db.models.fields.related.*,
+    django.db.models.query_utils.Q
+
+# 타입 검사를 무시할 클래스들
+ignored-classes=QuerySet,Manager
+
+[BASIC]
+# 단일 문자 변수 이름 허용
+good-names=i,j,x,y
+
+[IMPORTS]
+# 서드파티 라이브러리 목록
+known-third-party=numpy,pandas
+
+[REPORTS]
+# pylint 리포트 설정 (기본적으로 설정을 유지)
