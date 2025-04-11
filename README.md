@@ -107,23 +107,6 @@ python manage.py runserver
 - [CI/CD 파이프라인](./docs/ko/deploy/ci-cd.md) (준비 중)
 
 
-## 🏗️ 아키텍처
-
-```mermaid
-graph TD
-    Client[클라이언트] --> |HTTP/WS| NGINX
-    NGINX --> |Proxy| API[Django API]
-    NGINX --> |Static Files| Static[Static Files Server]
-    API --> |Queries| DB[(PostgreSQL)]
-    API --> |Cache| Redis[(Redis)]
-    API --> |Search| ES[(Elasticsearch)]
-    API --> |Tasks| TaskQueue[Task Queue]
-    TaskQueue --> Celery[Celery Workers]
-    Celery --> |Email| EmailService[Email Service]
-    Celery --> |Push| PushService[Push Notification]
-    Celery --> |File Processing| Storage[(S3 Storage)]
-```
-
 ## 📂 프로젝트 구조
 
 ```
