@@ -71,6 +71,9 @@ pip install -r requirements.txt
 # 소스 폴더로 이동
 cd src
 
+# logs 폴더 생성
+mkdir -p logs
+
 # 환경 변수 설정
 cp .env.example .env
 # .env 파일 편집하여 데이터베이스, 이메일, S3 등 설정

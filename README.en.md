@@ -71,6 +71,9 @@ pip install -r requirements.txt
 # Move to source folder
 cd src
 
+# Create logs file
+mkdir -p logs
+
 # Set environment variables
 cp .env.example .env
 # Edit .env file to configure database, email, S3, etc.
