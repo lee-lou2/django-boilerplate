@@ -24,17 +24,17 @@ urlpatterns = [
     path("_health/", lambda request: HttpResponse()),
 ]
 
-# 디버깅 모드 전환
+# Toggle debugging mode
 if settings.DEBUG:
     urlpatterns += debug_toolbar_urls()
 
-# 로컬 환경에서만 admin 페이지 접근 가능
+# Allow admin page access only in the local environment
 if settings.DJANGO_ENVIRONMENT == DjangoEnvironment.LOCAL.value:
     urlpatterns += [
         path("admin/", admin.site.urls),
     ]
 
-# 로컬, 개발, 스테이지 환경에서만 API 문서 접근 가능
+# Allow API documentation access only in local, develop, and stage environments
 if settings.DJANGO_ENVIRONMENT in [
     DjangoEnvironment.LOCAL.value,
     DjangoEnvironment.DEVELOP.value,

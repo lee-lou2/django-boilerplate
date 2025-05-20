@@ -8,7 +8,7 @@ from apps.device.v1.serializers import DeviceSerializer, PushTokenSerializer
 
 
 class DeviceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
-    """디바이스"""
+    """Device"""
 
     serializer_class = DeviceSerializer
     permission_classes = [IsAuthenticated]
@@ -23,9 +23,9 @@ class DeviceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
             201: DeviceSerializer,
         },
         tags=["device"],
-        summary="사용자 디바이스 생성",
+        summary="Create user device",
         description="""
-        로그인한 사용자의 디바이스를 생성합니다.
+        Creates a device for the authenticated user.
         """,
     )
     def create(self, request, *args, **kwargs):
@@ -33,7 +33,7 @@ class DeviceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
 
 class PushTokenViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
-    """푸시 토큰"""
+    """Push token"""
 
     serializer_class = PushTokenSerializer
     permission_classes = [IsAuthenticated]
@@ -48,9 +48,9 @@ class PushTokenViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
             201: PushTokenSerializer,
         },
         tags=["device"],
-        summary="사용자 푸시 토큰 생성",
+        summary="Create user push token",
         description="""
-        로그인한 사용자의 푸시 토큰을 생성합니다.
+        Creates a push token for the authenticated user.
         """,
     )
     def create(self, request, *args, **kwargs):

@@ -9,10 +9,10 @@ from apps.user.models import User
 
 
 class DeviceSerializerTests(APITestCase):
-    """DeviceSerializer 테스트"""
+    """DeviceSerializer tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -26,7 +26,7 @@ class DeviceSerializerTests(APITestCase):
         }
 
     def test_성공__디바이스_등록_성공(self):
-        """디바이스 등록 성공 테스트"""
+        """Device registration success test"""
         serializer = DeviceSerializer(
             data=self.device_data, context={"request": self.request}
         )
@@ -36,7 +36,7 @@ class DeviceSerializerTests(APITestCase):
         self.assertEqual(device.user, self.user)
 
     def test_실패__다바이스_등록_시_UUID_형식이_올바르지_않음(self):
-        """다바이스 등록 시 UUID 형식이 올바르지 않음 테스트"""
+        """Device registration fails when UUID format is invalid"""
         data = {
             "uuid": "invalid-uuid",
         }
@@ -45,20 +45,20 @@ class DeviceSerializerTests(APITestCase):
         self.assertIn("uuid", serializer.errors)
 
     def test_실패__디바이스_등록_시_UUID_중복(self):
-        """디바이스 등록 시 UUID 중복 테스트"""
-        # 먼저 디바이스 생성
+        """Device registration fails when UUID is duplicated"""
+        # Create the device first
         Device.objects.create(
             user=self.user,
             uuid=self.valid_uuid,
         )
 
-        # 같은 UUID로 다시 시도
+        # Try again with the same UUID
         serializer = DeviceSerializer(data=self.device_data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("uuid", serializer.errors)
 
     def test_실패__디바이스_등록_시_UUID_필드가_없음(self):
-        """디바이스 등록 시 UUID 필드가 없음 테스트"""
+        """Device registration fails when UUID field is missing"""
         data = {}
         serializer = DeviceSerializer(data=data)
         self.assertFalse(serializer.is_valid())
@@ -66,10 +66,10 @@ class DeviceSerializerTests(APITestCase):
 
 
 class DeviceViewTests(APITestCase):
-    """DeviceViewSet 테스트"""
+    """DeviceViewSet tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -83,7 +83,7 @@ class DeviceViewTests(APITestCase):
         }
 
     def test_성공__디바이스_등록_성공(self):
-        """디바이스 등록 성공 테스트"""
+        """Device registration success test"""
         response = self.client.post(self.create_url, self.device_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Device.objects.count(), 1)
@@ -92,7 +92,7 @@ class DeviceViewTests(APITestCase):
         self.assertEqual(device.user, self.user)
 
     def test_실패__다바이스_등록_시_UUID_형식이_올바르지_않음(self):
-        """다바이스 등록 시 UUID 형식이 올바르지 않음 테스트"""
+        """Device registration fails when UUID format is invalid"""
         data = {
             "uuid": "invalid-uuid",
         }
@@ -102,21 +102,21 @@ class DeviceViewTests(APITestCase):
         self.assertIn("uuid", response.data)
 
     def test_실패__디바이스_등록_시_UUID_중복(self):
-        """디바이스 등록 시 UUID 중복 테스트"""
-        # 먼저 디바이스 생성
+        """Device registration fails when UUID is duplicated"""
+        # Create the device first
         Device.objects.create(
             user=self.user,
             uuid=self.valid_uuid,
         )
 
-        # 같은 UUID로 다시 시도
+        # Try again with the same UUID
         response = self.client.post(self.create_url, self.device_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Device.objects.count(), 1)
         self.assertIn("uuid", response.data)
 
     def test_실패__디바이스_등록_시_UUID_필드가_없음(self):
-        """디바이스 등록 시 UUID 필드가 없음 테스트"""
+        """Device registration fails when UUID field is missing"""
         data = {}
         response = self.client.post(self.create_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -125,10 +125,10 @@ class DeviceViewTests(APITestCase):
 
 
 class PushTokenSerializerTests(APITestCase):
-    """PushTokenSerializer 테스트"""
+    """PushTokenSerializer tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -147,7 +147,7 @@ class PushTokenSerializerTests(APITestCase):
         }
 
     def test_성공__푸시_토큰_등록_성공(self):
-        """푸시 토큰 등록 성공 테스트"""
+        """Push token registration success test"""
         serializer = PushTokenSerializer(
             data=self.valid_token_data, context={"request": self.request}
         )
@@ -158,26 +158,26 @@ class PushTokenSerializerTests(APITestCase):
         self.assertTrue(token.is_valid)
 
     def test_실패__푸시_토큰_등록_시_토큰_필드가_없음(self):
-        """푸시 토큰 등록 시 토큰 필드가 없음 테스트"""
+        """Push token registration fails when token field is missing"""
         data = {}
         serializer = PushTokenSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("token", serializer.errors)
 
     def test_실패__푸시_토큰_등록_시_토큰_중복(self):
-        """푸시 토큰 등록 시 토큰 중복 테스트"""
+        """Push token registration fails when token is duplicated"""
         # save 메서드가 토큰을 무효화하고 새로운 토큰을 생성하도록 설계되어 있어
-        # 새 토큰 생성 시 실패가 일어나지 않음.
-        # 따라서 이 테스트는 이전 토큰의 상태가 변경되는지 확인
+        # Creating a new token does not fail.
+        # This test checks if the previous token state changes
         token = "sample-push-token-123"
 
-        # 첫 번째 토큰 생성
+        # Create the first token
         PushToken.objects.create(
             device=self.device,
             token=token,
         )
 
-        # 두 번째 토큰 생성
+        # Create the second token
         second_token_data = {
             "token": token,
         }
@@ -195,10 +195,10 @@ class PushTokenSerializerTests(APITestCase):
 
 
 class PushTokenViewTests(APITestCase):
-    """PushTokenViewSet 테스트"""
+    """PushTokenViewSet tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -216,7 +216,7 @@ class PushTokenViewTests(APITestCase):
         }
 
     def test_성공__푸시_토큰_등록_성공(self):
-        """푸시 토큰 등록 성공 테스트"""
+        """Push token registration success test"""
         response = self.client.post(
             self.create_url, self.valid_token_data, format="json"
         )
@@ -228,7 +228,7 @@ class PushTokenViewTests(APITestCase):
         self.assertTrue(token.is_valid)
 
     def test_실패__푸시_토큰_등록_시_디바이스_필드가_없음(self):
-        """푸시 토큰 등록 시 디바이스 필드가 없음 테스트"""
+        """Push token registration fails when device field is missing"""
         data = {
             "token": "sample-push-token-123",
         }
@@ -237,7 +237,7 @@ class PushTokenViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_실패__푸시_토큰_등록_시_토큰_필드가_없음(self):
-        """푸시 토큰 등록 시 토큰 필드가 없음 테스트"""
+        """Push token registration fails when token field is missing"""
         data = {}
         response = self.client.post(self.create_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -245,7 +245,7 @@ class PushTokenViewTests(APITestCase):
         self.assertIn("token", response.data)
 
     def test_실패__푸시_토큰_등록_시_토큰_중복(self):
-        """푸시 토큰 등록 시 토큰 중복 테스트"""
+        """Push token registration fails when token is duplicated"""
         # 먼저 토큰 생성
         token = "sample-push-token-123"
         PushToken.objects.create(
@@ -268,10 +268,10 @@ class PushTokenViewTests(APITestCase):
 
 
 class DeviceModelTests(APITestCase):
-    """Device 모델 테스트"""
+    """Device model tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -279,7 +279,7 @@ class DeviceModelTests(APITestCase):
         self.device_uuid = uuid.uuid4()
 
     def test_성공__디바이스_생성(self):
-        """디바이스 생성 성공 테스트"""
+        """Create device 성공 테스트"""
         device = Device.objects.create(
             user=self.user,
             uuid=self.device_uuid,
@@ -290,7 +290,7 @@ class DeviceModelTests(APITestCase):
         self.assertEqual(device.platform, DevicePlatform.ANDROID)
 
     def test_성공__디바이스_생성_기본_플랫폼(self):
-        """디바이스 생성 시 기본 플랫폼 설정 테스트"""
+        """Create device 시 기본 플랫폼 설정 테스트"""
         device = Device.objects.create(
             user=self.user,
             uuid=self.device_uuid,
@@ -299,10 +299,10 @@ class DeviceModelTests(APITestCase):
 
 
 class PushTokenModelTests(APITestCase):
-    """PushToken 모델 테스트"""
+    """PushToken model tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -315,7 +315,7 @@ class PushTokenModelTests(APITestCase):
         self.token = "sample-push-token-123"
 
     def test_성공__푸시_토큰_생성(self):
-        """푸시 토큰 생성 성공 테스트"""
+        """Push token creation success test"""
         push_token = PushToken.objects.create(
             device=self.device,
             token=self.token,
@@ -326,7 +326,7 @@ class PushTokenModelTests(APITestCase):
         self.assertIsNone(push_token.endpoint_arn)
 
     def test_성공__푸시_토큰_생성_시_endpoint_arn_설정(self):
-        """푸시 토큰 생성 시 endpoint_arn 설정 테스트"""
+        """Endpoint ARN set on push token creation test"""
         endpoint_arn = "arn:aws:sns:ap-northeast-2:123456789012:endpoint/APNS/MyApp/12345678-1234-1234-1234-123456789012"
         push_token = PushToken.objects.create(
             device=self.device,
@@ -336,28 +336,28 @@ class PushTokenModelTests(APITestCase):
         self.assertEqual(push_token.endpoint_arn, endpoint_arn)
 
     def test_성공__푸시_토큰_생성_시_기존_토큰_무효화(self):
-        """푸시 토큰 생성 시 기존 토큰 무효화 테스트"""
-        # 첫 번째 토큰 생성
+        """Invalidates previous token on creation test"""
+        # Create the first token
         first_token = PushToken.objects.create(
             device=self.device,
             token="first-token",
         )
         self.assertTrue(first_token.is_valid)
 
-        # 두 번째 토큰 생성
+        # Create the second token
         second_token = PushToken.objects.create(
             device=self.device,
             token="second-token",
         )
         self.assertTrue(second_token.is_valid)
 
-        # 첫 번째 토큰 다시 조회하여 무효화 확인
+        # Refresh the first token to confirm invalidation
         first_token.refresh_from_db()
         self.assertFalse(first_token.is_valid)
 
     def test_성공__푸시_토큰_무효화_후_새_토큰_등록(self):
-        """푸시 토큰 무효화 후 새 토큰 등록 테스트"""
-        # 토큰 생성 후 무효화
+        """Register new token after invalidation test"""
+        # Create a token and then invalidate it
         token = PushToken.objects.create(
             device=self.device,
             token=self.token,
@@ -365,49 +365,49 @@ class PushTokenModelTests(APITestCase):
         token.is_valid = False
         token.save()
 
-        # 같은 토큰으로 다시 생성 시도
+        # Attempt to create again with the same token
         new_token = PushToken.objects.create(
             device=self.device,
             token="new-token",
         )
         self.assertTrue(new_token.is_valid)
 
-        # 기존 토큰 상태 확인 (여전히 무효 상태여야 함)
+        # Check original token state (should remain invalid)
         token.refresh_from_db()
         self.assertFalse(token.is_valid)
 
 
 class DeviceAdminTests(APITestCase):
-    """DeviceAdmin 테스트"""
+    """DeviceAdmin tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
-        # 관리자 사용자 생성
+        """Set up test data"""
+        # Create admin user
         self.admin_user = User.objects.create_superuser(
             email="admin@example.com",
             password="adminpass123",
         )
 
-        # 일반 사용자 생성
+        # Create regular user
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
         )
 
-        # 디바이스 생성
+        # Create device
         self.device_uuid = uuid.uuid4()
         self.device = Device.objects.create(
             user=self.user,
             uuid=self.device_uuid,
         )
 
-        # 푸시 토큰 생성
+        # Create push token
         self.token = PushToken.objects.create(
             device=self.device,
             token="sample-push-token-123",
         )
 
-        # 관리자 클라이언트 설정
+        # Configure admin client
         self.client = APIClient()
         self.client.login(email="admin@example.com", password="adminpass123")
 
@@ -423,26 +423,26 @@ class DeviceAdminTests(APITestCase):
 
 
 class DeviceMultiUserTests(APITestCase):
-    """여러 사용자의 디바이스 관련 테스트"""
+    """Multi-user device tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
-        # 사용자1 생성
+        """Set up test data"""
+        # Create user1
         self.user1 = User.objects.create_user(
             email="user1@example.com",
             password="password123",
         )
 
-        # 사용자2 생성
+        # Create user2
         self.user2 = User.objects.create_user(
             email="user2@example.com",
             password="password123",
         )
 
-        # 디바이스 UUID 생성
+        # Generate device UUID
         self.device_uuid = uuid.uuid4()
 
-        # 클라이언트 설정
+        # Configure client
         self.client = APIClient()
         self.create_url = "/v1/device/"
 
@@ -464,16 +464,16 @@ class DeviceMultiUserTests(APITestCase):
         self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_성공__사용자별_디바이스_목록_분리(self):
-        """사용자별 디바이스 목록이 올바르게 분리되는지 테스트"""
-        # 사용자1의 디바이스 등록
+        """Ensure device lists are separated per user"""
+        # Register device for user1
         self.client.force_authenticate(user=self.user1)
         self.client.post(self.create_url, {"uuid": uuid.uuid4()}, format="json")
 
-        # 사용자2의 디바이스 등록
+        # Register device for user2
         self.client.force_authenticate(user=self.user2)
         self.client.post(self.create_url, {"uuid": uuid.uuid4()}, format="json")
 
-        # 각 사용자별 디바이스 수 확인
+        # Check number of devices per user
         user1_devices = Device.objects.filter(user=self.user1).count()
         user2_devices = Device.objects.filter(user=self.user2).count()
 
@@ -482,17 +482,17 @@ class DeviceMultiUserTests(APITestCase):
 
 
 class PushTokenMultipleDevicesTests(APITestCase):
-    """여러 디바이스의 푸시 토큰 관련 테스트"""
+    """Multi-device push token tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
-        # 사용자 생성
+        """Set up test data"""
+        # Create user
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
         )
 
-        # 디바이스1 생성
+        # Create device1
         self.device1_uuid = uuid.uuid4()
         self.device1 = Device.objects.create(
             user=self.user,
@@ -500,7 +500,7 @@ class PushTokenMultipleDevicesTests(APITestCase):
             platform=DevicePlatform.ANDROID,
         )
 
-        # 디바이스2 생성
+        # Create device2
         self.device2_uuid = uuid.uuid4()
         self.device2 = Device.objects.create(
             user=self.user,
@@ -508,15 +508,15 @@ class PushTokenMultipleDevicesTests(APITestCase):
             platform=DevicePlatform.IOS,
         )
 
-        # 클라이언트 설정
+        # Configure client
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
     def test_성공__여러_디바이스에_동일한_푸시_토큰_등록_시도(self):
-        """여러 디바이스에 동일한 푸시 토큰 등록 시도 테스트"""
+        """Attempt to register same push token on multiple devices"""
         token = "same-push-token-for-both-devices"
 
-        # 디바이스1에 토큰 등록
+        # Register token to device1
         response1 = self.client.post(
             f"/v1/device/{self.device1_uuid}/push_token/",
             {"token": token},
@@ -524,21 +524,21 @@ class PushTokenMultipleDevicesTests(APITestCase):
         )
         self.assertEqual(response1.status_code, status.HTTP_201_CREATED)
 
-        # 디바이스2에 동일한 토큰 등록 시도
+        # Attempt to register the same token to device2
         response2 = self.client.post(
             f"/v1/device/{self.device2_uuid}/push_token/",
             {"token": token},
             format="json",
         )
 
-        # 서로 다른 디바이스이므로 동일한 토큰 등록이 가능해야 함
-        # 하지만 validate_token 메서드에서 사용자의 모든 디바이스에 대해 토큰 중복 검사를 함
+        # Registration should succeed on a different device
+        # But validate_token checks all user devices for duplicates
         self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("token", response2.data)
 
     def test_성공__디바이스별_푸시_토큰_무효화_독립성(self):
-        """디바이스별 푸시 토큰 무효화 독립성 테스트"""
-        # 디바이스1에 토큰 등록
+        """Per-device push token invalidation independence test"""
+        # Register token to device1
         token1 = PushToken.objects.create(
             device=self.device1,
             token="device1-token",
@@ -554,26 +554,26 @@ class PushTokenMultipleDevicesTests(APITestCase):
         self.assertTrue(token1.is_valid)
         self.assertTrue(token2.is_valid)
 
-        # 디바이스1에 새 토큰 등록
+        # Register a new token to device1
         new_token1 = PushToken.objects.create(
             device=self.device1,
             token="device1-new-token",
         )
 
-        # 디바이스1의 기존 토큰은 무효화되어야 함
+        # Original token for device1 should be invalidated
         token1.refresh_from_db()
         self.assertFalse(token1.is_valid)
 
-        # 디바이스2의 토큰은 여전히 유효해야 함
+        # Token for device2 should still be valid
         token2.refresh_from_db()
         self.assertTrue(token2.is_valid)
 
 
 class DeviceViewSetAdditionalTests(APITestCase):
-    """DeviceViewSet 추가 테스트"""
+    """Additional DeviceViewSet tests"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -583,18 +583,18 @@ class DeviceViewSetAdditionalTests(APITestCase):
         self.create_url = "/v1/device/"
 
     def test_실패__인증되지_않은_사용자_접근(self):
-        """인증되지 않은 사용자 접근 테스트"""
-        # 인증되지 않은 클라이언트 생성
+        """Unauthenticated user access test"""
+        # Create an unauthenticated client
         unauthenticated_client = APIClient()
 
-        # 디바이스 생성 시도
+        # Create device 시도
         response = unauthenticated_client.post(
             self.create_url, {"uuid": uuid.uuid4()}, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_성공__플랫폼_지정_디바이스_등록(self):
-        """플랫폼을 지정하여 디바이스 등록 테스트"""
+        """Register device with specific platform test"""
         device_data = {
             "uuid": uuid.uuid4(),
             "platform": DevicePlatform.IOS,
@@ -606,10 +606,10 @@ class DeviceViewSetAdditionalTests(APITestCase):
         self.assertEqual(int(device.platform), DevicePlatform.IOS.value)
 
     def test_실패__잘못된_플랫폼_값으로_디바이스_등록(self):
-        """잘못된 플랫폼 값으로 디바이스 등록 테스트"""
+        """Register device with invalid platform test"""
         device_data = {
             "uuid": uuid.uuid4(),
-            "platform": 99,  # 존재하지 않는 플랫폼 값
+            "platform": 99,  # nonexistent platform value
         }
         response = self.client.post(self.create_url, device_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

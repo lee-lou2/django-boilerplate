@@ -3,7 +3,7 @@ from rest_framework.views import exception_handler
 
 
 def default_exception_handler(exc, context):
-    """기본 오류 핸들러"""
+    """Default error handler"""
     response = exception_handler(exc, context)
     if (
         response is None
@@ -12,7 +12,7 @@ def default_exception_handler(exc, context):
         or not isinstance(response.data, dict)
     ):
         return response
-    # 오류 구조 변경
+    # Modify error structure
     for key, value in response.data.items():
         response.data[key] = (
             [{"message": item, "error_code": "E0000000"} for item in value]

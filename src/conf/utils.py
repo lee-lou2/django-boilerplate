@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def load_aws_parameters(path: str, region_name: str):
-    """AWS 파라미터 스토어에서 환경변수 로드"""
+    """Load environment variables from AWS Parameter Store"""
     ssm = boto3.client(service_name="ssm", region_name=region_name)
     if ssm is None:
         return
@@ -29,4 +29,6 @@ def load_aws_parameters(path: str, region_name: str):
         for key, value in values.items():
             os.environ[key] = value
     except Exception as e:
-        logger.info(f"파라미터 스토어 환경 변수 조회 실패, 오류 내용 : {e}")
+        logger.info(
+            f"Failed to retrieve environment variables from Parameter Store: {e}"
+        )

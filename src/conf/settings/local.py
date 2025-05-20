@@ -1,6 +1,6 @@
 from conf.settings.base import *
 
-# 로컬 이메일 발송
+# Send emails to the console in the local environment
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # LOGGING LEVEL

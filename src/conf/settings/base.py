@@ -8,14 +8,14 @@ from dotenv import load_dotenv
 from common.enums.base import DjangoEnvironment
 from conf.utils import load_aws_parameters
 
-# 파이썬 버전 확인
+# Check Python version
 if sys.version_info.major != 3 or sys.version_info.minor != 12:
-    raise RuntimeError("파이썬 버전이 올바르지 않습니다")
+    raise RuntimeError("Invalid Python version")
 
-# 프로젝트 설정
+# Project configuration
 PROJECT_NAME = "django_boilerplate"
 
-# 기본 설정
+# Basic settings
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SERVER
@@ -24,30 +24,30 @@ DJANGO_ENVIRONMENT = DJANGO_SETTINGS_MODULE.split(".settings.")[1]
 if DJANGO_ENVIRONMENT not in [env.value for env in DjangoEnvironment]:
     raise ValueError("Invalid DJANGO_ENVIRONMENT")
 
-# .env 로드
+# Load .env
 load_dotenv()
 
-# AWS 설정
+# AWS settings
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 AWS_REGION_NAME = os.environ.get("AWS_REGION_NAME")
 
-# AWS 파라미터 스토어 조회(1회 실행)
+# Retrieve AWS Parameter Store values (run once)
 if DJANGO_ENVIRONMENT not in [
     DjangoEnvironment.LOCAL.value,
     DjangoEnvironment.TEST.value,
 ] and not os.environ.get("LOADED_SETTINGS"):
     load_aws_parameters(f"/{PROJECT_NAME}/{DJANGO_ENVIRONMENT}", AWS_REGION_NAME)
 
-# 기본 설정
+# Default settings
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG") == "True"
 
-# 허용 호스트
+# Allowed hosts
 ALLOWED_HOSTS = ["*"]
 INTERNAL_IPS = ["127.0.0.1"]
 
-# 로컬 앱 추가
+# Local apps
 LOCAL_APPS = [
     "apps.user",
     "apps.account",
@@ -60,7 +60,7 @@ LOCAL_APPS = [
     "apps.game",
 ]
 
-# 외부 앱 추가
+# Third-party apps
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
@@ -72,7 +72,7 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt.token_blacklist",
 ]
 
-# 기본 앱 추가
+# Django apps
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -84,22 +84,22 @@ DJANGO_APPS = [
 
 INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS + DJANGO_APPS
 
-# 미들웨어 설정
+# Middleware configuration
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # CORS 설정
+    "corsheaders.middleware.CorsMiddleware",  # CORS settings
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_hosts.middleware.HostsRequestMiddleware",  # 호스트 분리
-    "debug_toolbar.middleware.DebugToolbarMiddleware",  # 디버깅을 위한 도구
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # Static 서버 없이 파일 처리
+    "django_hosts.middleware.HostsRequestMiddleware",  # Host-based routing
+    "debug_toolbar.middleware.DebugToolbarMiddleware",  # Debugging tool
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Serve files without a static server
 ]
 
-# 템플릿 설정
+# Template configuration
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -118,7 +118,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "conf.wsgi.application"
 
-# 데이터베이스 설정
+# Database configuration
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -130,25 +130,25 @@ DATABASES = {
     },
 }
 
-# 데이터베이스 마이그레이션 설정
+# Database migration configuration
 # [How]
-# - 모델 구현 시 Meta 클래스에 database 속성 추가
-# - 예) class Meta: database = "statistics"
-# - 이렇게 추가 후 DATABASE_APPS_MAPPING_FOR_MIGRATIONS 에 추가하면
-#   해당 모델은 지정한 데이터베이스로 마이그레이션 됨
+# - When implementing a model add a `database` attribute to its Meta class
+# - Example: class Meta: database = "statistics"
+# - After adding it, include it in DATABASE_APPS_MAPPING_FOR_MIGRATIONS so that
+#   the model migrates to the specified database
 DATABASE_APPS_MAPPING_FOR_MIGRATIONS = {}
 
-# 데이터베이스 라우터
+# Database routers
 DATABASE_ROUTERS = ["conf.routers.DefaultRouter"]
 
-# 캐시
+# Cache
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
 
-# 패스워드 유효성 검사
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
@@ -159,33 +159,33 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # AUTH_USER_MODEL
-AUTH_USER_MODEL = "user.User"  # 기본 유저 모델
+AUTH_USER_MODEL = "user.User"  # Default user model
 
 # EMAIL
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # 이메일 백엔드
-EMAIL_HOST = os.environ.get("EMAIL_HOST")  # 이메일 호스트
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT"))  # 이메일 포트
-EMAIL_USE_TLS = True  # TLS 사용 여부
-EMAIL_USE_SSL = False  # SSL 사용 여부
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")  # 이메일 호스트 유저
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")  # 이메일 호스트 패스워드
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # Email backend
+EMAIL_HOST = os.environ.get("EMAIL_HOST")  # Email host
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT"))  # Email port
+EMAIL_USE_TLS = True  # Whether to use TLS
+EMAIL_USE_SSL = False  # Whether to use SSL
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")  # Email host user
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")  # Email host password
 
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")  # 기본 발송 이메일 주소
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")  # Default from email address
 
-# 언어 및 시간 설정
-LANGUAGE_CODE = "ko"  # 언어 코드
-TIME_ZONE = "Asia/Seoul"  # 시간대
-USE_I18N = True  # 다국어 지원
-USE_TZ = True  # 시간대 사용(데이터 저장 시 UTC로 저장, 조회 시 TIME_ZONE으로 변환)
+# Language and time settings
+LANGUAGE_CODE = "ko"  # Language code
+TIME_ZONE = "Asia/Seoul"  # Time zone
+USE_I18N = True  # Internationalization support
+USE_TZ = True  # Enable timezone support (store in UTC, display in TIME_ZONE)
 
 # APPEND_SLASH
-APPEND_SLASH = False  # 슬래시 추가 여부
+APPEND_SLASH = False  # Whether to append a slash
 
 # STATIC
-STATIC_URL = "/static/"  # 정적 파일 URL
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # 정적 파일 루트
+STATIC_URL = "/static/"  # Static file URL
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Static file root
 STATICFILES_STORAGE = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"  # 정적 파일 저장소
+    "whitenoise.storage.CompressedManifestStaticFilesStorage"  # Static file storage
 )
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -195,39 +195,39 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 # HOST
-DEFAULT_HOST = "api"  # 기본 호스트
-ROOT_HOSTCONF = "conf.hosts"  # 호스트 설정
-ROOT_URLCONF = "conf.urls.api"  # URL 설정
+DEFAULT_HOST = "api"  # Default host
+ROOT_HOSTCONF = "conf.hosts"  # Host settings
+ROOT_URLCONF = "conf.urls.api"  # URL configuration
 
 # DRF
 REST_FRAMEWORK = {
     "COERCE_DECIMAL_TO_STRING": False,
-    # 기본 인증 클래스 설정
+    # Default authentication classes
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "conf.authentications.JWTLazyUserAuthentication",
     ],
-    # 기본 퍼미션 클래스 설정
+    # Default permission classes
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
-    # 기본 랜더러 클래스 설정
+    # Default renderer classes
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
-    # 예외 핸들러 설정
+    # Exception handler
     "EXCEPTION_HANDLER": "conf.exceptions.default_exception_handler",
-    # 필터 백엔드 설정
+    # Filter backends
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
     ],
-    # 기본 페이지네이션 클래스 설정
+    # Default pagination class
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    # 기본 스키마 클래스 설정
+    # Default schema class
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    # 테스트 요청 포맷 설정
+    # Test request format
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
-    # 기본 캐시 설정
+    # Default throttle rates
     "DEFAULT_THROTTLE_RATES": {
         "feed:create": "1/second",
         "feed:like": "2/second",
@@ -242,23 +242,23 @@ REST_FRAMEWORK = {
 }
 
 
-# SIMPLE JWT 설정
+# SIMPLE JWT configuration
 SIMPLE_JWT = {
-    # 토큰 만료 시간 설정
+    # Token expiration settings
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    # 리프래시 토큰 교체 여부
+    # Whether to rotate refresh tokens
     "ROTATE_REFRESH_TOKENS": False,
-    # 블랙리스트 설정
+    # Blacklist setting
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
-    # 알고리즘 설정
+    # Algorithm setting
     "ALGORITHM": "HS256",
-    # 토큰 시크릿 키 설정
+    # Token secret key
     "SIGNING_KEY": SECRET_KEY,
     "VERIFYING_KEY": None,
     "AUDIENCE": None,
-    # ISSUER 설정
+    # Issuer setting
     "ISSUER": PROJECT_NAME,
     "AUTH_HEADER_TYPES": ("Bearer",),
     "USER_ID_FIELD": "id",
@@ -301,7 +301,7 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-# Sentry(1회 실행)
+# Sentry (run once)
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
 if SENTRY_DSN and os.environ.get("LOADED_SETTINGS"):
     import sentry_sdk
@@ -364,16 +364,16 @@ LOGGING = {
 }
 
 # Email Verification
-EMAIL_VERIFICATION_TIMEOUT = 60 * 10  # 이메일 검증 토큰 만료 시간 10분
+EMAIL_VERIFICATION_TIMEOUT = 60 * 10  # Email verification token expires in 10 minutes
 EMAIL_VERIFICATION_HASH_SALT = os.environ.get("EMAIL_VERIFICATION_HASH_SALT", "")
 SIGNUP_CONFIRM_URL = os.environ.get("SIGNUP_CONFIRM_URL")
 RESET_PASSWORD_URL = os.environ.get("RESET_PASSWORD_URL")
 SIGNUP_COMPLETED_URL = os.environ.get("SIGNUP_COMPLETED_URL")
 
-# 개인정보 암호키
+# Personal data encryption key
 USER_ENCRYPTION_KEY = os.environ.get("USER_ENCRYPTION_KEY", "")
 
-# 소셜 로그인 - 구글
+# Social login - Google
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI")
@@ -393,10 +393,10 @@ GOOGLE_CLIENT_SECRETS_CONFIG = {
 # Celery
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379")
 
-# 한 번 실행이 필요한 로직 예외용
+# For logic that should run only once
 os.environ.setdefault("LOADED_SETTINGS", "True")
 
-# 출석 체크 정책
+# Attendance check policy
 ATTENDANCE_CHECK_REWARD_POINTS = list(
     map(
         lambda x: int(x),

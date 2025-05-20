@@ -5,7 +5,7 @@ from apps.device.models import Device, PushToken
 
 
 class PushTokenInline(admin.TabularInline):
-    """푸시 토큰 인라인"""
+    """Push token inline"""
 
     model = PushToken
     extra = 0
@@ -16,7 +16,7 @@ class PushTokenInline(admin.TabularInline):
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
-    """디바이스 어드민"""
+    """Device admin"""
 
     list_display = [
         "id",
@@ -33,13 +33,13 @@ class DeviceAdmin(admin.ModelAdmin):
     inlines = [PushTokenInline]
 
     def user_username(self, obj):
-        """사용자 이름"""
+        """User name"""
         return obj.user.profile.nickname
 
-    user_username.short_description = "사용자"
+    user_username.short_description = "User"
 
     def push_token_count(self, obj):
-        """유효한 푸시 토큰 수"""
+        """Number of valid push tokens"""
         valid_count = obj.push_tokens.filter(is_valid=True).count()
         total_count = obj.push_tokens.count()
 
@@ -52,12 +52,12 @@ class DeviceAdmin(admin.ModelAdmin):
             '<span style="color: {};">{} / {}</span>', color, valid_count, total_count
         )
 
-    push_token_count.short_description = "유효한 토큰 / 전체 토큰"
+    push_token_count.short_description = "Valid tokens / total tokens"
 
 
 @admin.register(PushToken)
 class PushTokenAdmin(admin.ModelAdmin):
-    """푸시 토큰 어드민"""
+    """Push token admin"""
 
     list_display = [
         "id",
@@ -80,35 +80,35 @@ class PushTokenAdmin(admin.ModelAdmin):
     actions = ["mark_as_valid", "mark_as_invalid"]
 
     def token_truncated(self, obj):
-        """토큰 (축약)"""
+        """Token (truncated)"""
         if len(obj.token) > 20:
             return f"{obj.token[:20]}..."
         return obj.token
 
-    token_truncated.short_description = "토큰"
+    token_truncated.short_description = "Token"
 
     def device_uuid(self, obj):
-        """디바이스 UUID"""
+        """Device UUID"""
         return obj.device.uuid
 
-    device_uuid.short_description = "디바이스 UUID"
+    device_uuid.short_description = "Device UUID"
 
     def user_username(self, obj):
-        """사용자 이름"""
+        """User name"""
         return obj.device.user.profile.nickname
 
-    user_username.short_description = "사용자"
+    user_username.short_description = "User"
 
     def mark_as_valid(self, request, queryset):
-        """유효로 표시"""
+        """Mark selected tokens as valid"""
         updated = queryset.update(is_valid=True)
-        self.message_user(request, f"{updated}개의 토큰이 유효로 표시되었습니다.")
+        self.message_user(request, f"{updated} tokens marked as valid.")
 
-    mark_as_valid.short_description = "선택된 토큰을 유효로 표시"
+    mark_as_valid.short_description = "Mark selected tokens as valid"
 
     def mark_as_invalid(self, request, queryset):
-        """무효로 표시"""
+        """Mark selected tokens as invalid"""
         updated = queryset.update(is_valid=False)
-        self.message_user(request, f"{updated}개의 토큰이 무효로 표시되었습니다.")
+        self.message_user(request, f"{updated} tokens marked as invalid.")
 
-    mark_as_invalid.short_description = "선택된 토큰을 무효로 표시"
+    mark_as_invalid.short_description = "Mark selected tokens as invalid"

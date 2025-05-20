@@ -16,7 +16,7 @@ class RedisCache(DjangoRedisCache):
         timeout=60 * 60,
         smoothly_timeout=60 * 10,
     ):
-        """캐시 데이터 저장"""
+        """Store cache data"""
         value = value_class(**value_kwargs)
         self.set(
             key,
@@ -38,13 +38,13 @@ class RedisCache(DjangoRedisCache):
         timeout=60 * 60,
         smoothly_timeout=60 * 10,
     ):
-        """스무스한 데이터 조회 및 설정"""
-        # 데이터 조회
+        """Smooth retrieval and setting of data"""
+        # Retrieve data
         data = self.get(key)
         if data is None or type(data) != dict:
             data = {}
 
-        # 데이터 조회
+        # Retrieve data
         value = data.get("value")
         smoothly_datetime = (
             datetime.datetime.strptime(
@@ -54,13 +54,13 @@ class RedisCache(DjangoRedisCache):
             else None
         )
 
-        # 1. 유효한 데이터의 경우 그대로 반환
+        # 1. If data is valid, return it as is
         if smoothly_datetime is not None and smoothly_datetime >= timezone.localtime():
             return value
         args = [key, value_class, value_kwargs, timeout, smoothly_timeout]
-        # 2. 데이터는 있지만 유효하지 않은 경우
+        # 2. Data exists but is not valid
         if smoothly_datetime is not None and smoothly_datetime < timezone.localtime():
-            # 비동기 처리되는 동안 기존 데이터를 반환
+            # Return existing data while asynchronous process runs
             self._set_value(
                 key=key,
                 value_class=lambda v: v,
@@ -68,10 +68,10 @@ class RedisCache(DjangoRedisCache):
                 timeout=timeout,
                 smoothly_timeout=smoothly_timeout,
             )
-            # 비동기
+            # Asynchronous
             threading.Thread(target=self._set_value, args=args).start()
-        # 3. 데이터가 없는 경우
+        # 3. If there is no data
         else:
-            # 동기
+            # Synchronous
             value = self._set_value(*args)
         return value

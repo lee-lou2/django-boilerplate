@@ -11,23 +11,23 @@ from drf_spectacular.plumbing import build_bearer_security_scheme_object
 class SimpleLazyUser(SimpleLazyObject):
     @property
     def is_authenticated(self):
-        """인증 여부: 토큰 인증 시 인증된 사용자로 판단"""
+        """Authentication status: considered authenticated when using token auth"""
         return True
 
     def __bool__(self):
-        """사용자 존재: Permission 에서 사용자 인증 여부 확인"""
+        """User existence: used by permissions to check authentication"""
         return True
 
 
 class JWTLazyUserAuthentication(JWTAuthentication):
     """
-    JWT 사용자 지연 인증
-    - 토큰 검증을 통해 인증을 진행
-    - 데이터베이스에 저장된 사용자 정보는 실제 데이터가 사용되는 곳에서 지연 로딩
+    JWT lazy user authentication
+    - Authenticates using token validation
+    - User data stored in the database is lazily loaded where it is actually used
     """
 
     def get_active_user(self, user_id):
-        """지연 로딩: 사용자 조회 및 활성화 여부 확인"""
+        """Lazy loading: fetch user and check if active"""
         try:
             user = self.user_model.objects.get(**{api_settings.USER_ID_FIELD: user_id})
         except self.user_model.DoesNotExist:
@@ -41,7 +41,7 @@ class JWTLazyUserAuthentication(JWTAuthentication):
         return user
 
     def get_user(self, validated_token):
-        """토큰을 이용한 사용자 조회"""
+        """Retrieve user using the token"""
         try:
             user_id = validated_token[api_settings.USER_ID_CLAIM]
         except KeyError:
@@ -53,16 +53,16 @@ class JWTLazyUserAuthentication(JWTAuthentication):
 
 class JWTLazyUserAuthenticationScheme(OpenApiAuthenticationExtension):
     """
-    drf-spectacular 확장 클래스
-    - 인증 확장 클래스 정의
-    - 인증 확장 클래스 정의
+    drf-spectacular extension class
+    - Defines the authentication extension
+    - Defines the authentication extension
     """
 
     target_class = JWTLazyUserAuthentication
     name = "Bearer"
 
     def get_security_definition(self, auto_schema):
-        """인증 확장 클래스 정의"""
+        """Define the authentication extension"""
         return build_bearer_security_scheme_object(
             header_name="Authorization",
             token_prefix="Bearer",

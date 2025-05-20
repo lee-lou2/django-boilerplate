@@ -2,7 +2,7 @@ from conf.settings.base import *
 
 # CORS
 CORS_ALLOWED_ORIGINS = [
-    # 허용 오리진 추가
+    # Add allowed origins here
 ]
 
 # LOGGING LEVEL
