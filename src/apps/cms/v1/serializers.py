@@ -6,8 +6,8 @@ from apps.cms.models import Notice, Event, Faq, FaqCategory
 
 class NoticeSerializer(serializers.ModelSerializer):
     """
-    공지사항 시리얼라이저:
-    공지사항 리스트 및 상세 조회
+    Notice Serializer:
+    List and detail view for notices.
     """
 
     class Meta:
@@ -26,18 +26,18 @@ class NoticeSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     """
-    이벤트 시리얼라이저:
-    이벤트 리스트 및 상세 조회
-    종료된 이벤트 여부 표시
+    Event Serializer:
+    List and detail view for events.
+    Indicates whether the event has ended.
     """
 
     is_event_ended = serializers.SerializerMethodField(
         method_name="get_is_event_ended",
-        help_text="이벤트 종료 여부",
+        help_text="Indicates if the event has ended",
     )
 
     def get_is_event_ended(self, obj):
-        """이벤트 종료 여부 확인"""
+        """Check if the event has ended"""
         return obj.event_end_at <= timezone.now() if obj.event_end_at else False
 
     class Meta:
@@ -59,8 +59,8 @@ class EventSerializer(serializers.ModelSerializer):
 
 class FaqCategorySerializer(serializers.ModelSerializer):
     """
-    FAQ 카테고리 시리얼라이저:
-    FAQ 리스트 및 상세 조회 시 카테고리 정보
+    FAQ Category Serializer:
+    Category information for FAQ list and detail views.
     """
 
     class Meta:
@@ -75,11 +75,11 @@ class FaqCategorySerializer(serializers.ModelSerializer):
 
 class FaqSerializer(serializers.ModelSerializer):
     """
-    FAQ 시리얼라이저:
-    FAQ 리스트 및 상세 조회
+    FAQ Serializer:
+    List and detail view for FAQs.
     """
 
-    category = FaqCategorySerializer(help_text="FAQ 카테고리")
+    category = FaqCategorySerializer(help_text="FAQ Category")
 
     class Meta:
         model = Faq

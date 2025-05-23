@@ -12,33 +12,33 @@ from common.enums.errors import (
 
 class ShortUrlSerializer(serializers.ModelSerializer):
     """
-    단축 URL 시리얼라이저:
-    입력된 정보등을 이용해서 존재 여부 확인
-    특별한 방식으로 중복되지 않는 고유한 값 생성
-    항상 빠르고 안전하게 생성하고 관리
+    Short URL Serializer:
+    Checks existence using input information.
+    Generates a unique, non-duplicate value in a special way.
+    Always creates and manages quickly and safely.
     """
 
     random_key = serializers.HiddenField(
         default=generate_random_key,
-        help_text="랜덤 키",
+        help_text="Random key",
     )
     hashed_value = serializers.HiddenField(
         default="",
-        help_text="해시값",
+        help_text="Hash value",
     )
     short_key = serializers.CharField(
         read_only=True,
-        help_text="단축 URL",
+        help_text="Short URL",
     )
 
     def validate_og_tag(self, value):
-        # OG 태그는 JSON 형식
+        # OG tag must be in JSON format
         if value and not isinstance(value, dict):
             raise serializers.ValidationError(E005_INVALID_OG_TAG_FORMAT)
         return value
 
     def validate(self, attrs):
-        # hashed_value 값 생성
+        # Generate hashed_value
         concatenated = "".join(
             [
                 attrs.get("ios_deep_link", ""),
@@ -49,11 +49,11 @@ class ShortUrlSerializer(serializers.ModelSerializer):
             ]
         )
 
-        # SHA-256 해시 생성
+        # Generate SHA-256 hash
         # [Why]
-        # Q. 왜 SHA-256 해시를 사용하는가?
-        # A. SHA-256은 보안성이 높고, 해시 충돌 가능성이 낮기 때문
-        #    또한, 해시값이 고유해야 하므로, 단축 URL 생성 시 중복 체크를 위해 사용
+        # Q. Why use SHA-256 hash?
+        # A. SHA-256 is highly secure and has a low probability of hash collisions.
+        #    Also, since the hash value must be unique, it is used for duplicate checking when creating short URLs.
         hasher = hashlib.sha256()
         hasher.update(concatenated.encode("utf-8"))
         hashed_value = hasher.hexdigest()
@@ -64,13 +64,13 @@ class ShortUrlSerializer(serializers.ModelSerializer):
         return attrs
 
     def to_representation(self, instance):
-        # ShortURL 의 Key 값 생성
+        # Generate Key value for ShortURL
         short_key = id_to_key(instance.id)
         random_key = instance.random_key
         # [Why]
-        # Q. 왜 랜덤 키와 PK에 대한 인덱스를 사용하여 단축 URL을 생성하는가?
-        # A. 랜덤 키는 고유성을 보장하고, PK는 데이터베이스에서의 유일성을 보장하기 때문
-        #    두 값을 조합할 경우 언제나 고유한 단축 URL을 생성할 수 있음
+        # Q. Why generate a short URL using a random key and an index for the PK?
+        # A. The random key ensures uniqueness, and the PK guarantees uniqueness in the database.
+        #    Combining these two values always allows for the creation of a unique short URL.
         instance.short_key = f"{random_key[:2]}{short_key}{random_key[2:]}"
         return super().to_representation(instance)
 
@@ -92,29 +92,29 @@ class ShortUrlSerializer(serializers.ModelSerializer):
 
 class ShortUrlRedirectSerializer(serializers.ModelSerializer):
     """
-    단축 URL 리다이렉트 시리얼라이저:
-    숏링크에 해당하는 원본 링크로 리다이렉트
-    방문 기록 저장
+    Short URL Redirect Serializer:
+    Redirects to the original link corresponding to the short link.
+    Saves visit history.
     """
 
     def save(self, **kwargs):
-        # 요청 객체에서 필요한 정보 추출
+        # Extract necessary information from the request object
         request = self.context.get("request")
 
-        # IP 주소 추출
+        # Extract IP address
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
-            # X-Forwarded-For가 있으면 첫 번째 IP(실제 클라이언트 IP)만 사용
+            # If X-Forwarded-For exists, use only the first IP (actual client IP)
             ip_address = x_forwarded_for.split(",")[0].strip()
         else:
-            # 없으면 REMOTE_ADDR 사용
+            # Otherwise, use REMOTE_ADDR
             ip_address = request.META.get("REMOTE_ADDR")
 
-        # 추가 데이터 추출
+        # Extract additional data
         user_agent = request.META.get("HTTP_USER_AGENT")
         referrer = request.query_params.get("referrer")
 
-        # 방문 기록 생성
+        # Create visit record
         ShortUrlVisit.objects.create(
             short_url=self.instance,
             referrer=referrer,

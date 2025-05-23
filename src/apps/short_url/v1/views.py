@@ -12,7 +12,7 @@ class ShortUrlViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
 ):
-    """단축 URL 뷰셋"""
+    """Short URL ViewSet"""
 
     serializer_class = ShortUrlSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -23,10 +23,10 @@ class ShortUrlViewSet(
             201: ShortUrlSerializer,
         },
         tags=["short-url"],
-        summary="단축URL 생성",
+        summary="Create Short URL",
         description="""
-        단축 URL을 생성합니다.
-        4자리 랜덤 키와 id를 문자열로 변경한 값을 결합해 ShortKey를 생성합니다.
+        Creates a short URL.
+        Generates a ShortKey by combining a 4-character random key and the ID converted to a string.
         """,
     )
     def create(self, request, *args, **kwargs):
@@ -34,7 +34,7 @@ class ShortUrlViewSet(
 
 
 class ShortUrlRedirectView(generics.RetrieveAPIView):
-    """단축 URL 리다이렉트 뷰"""
+    """Short URL Redirect View"""
 
     serializer_class = ShortUrlRedirectSerializer
     permission_classes = []
@@ -45,9 +45,9 @@ class ShortUrlRedirectView(generics.RetrieveAPIView):
             200: ShortUrlRedirectSerializer,
         },
         tags=["short-url"],
-        summary="단축URL 리다이렉트",
+        summary="Redirect Short URL",
         description="""
-        단축 URL을 리다이렉트합니다.
+        Redirects the short URL.
         """,
     )
     def retrieve(self, request, *args, **kwargs):

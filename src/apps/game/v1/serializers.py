@@ -10,21 +10,21 @@ from apps.game.models import AttendanceCheck
 
 class AttendanceCheckSerializer(serializers.ModelSerializer):
     """
-    출석 체크 시리얼라이저:
-    마지막 출석 체크 이력을 조회해서 현재의 상태를 확인
-    그리고 연속 참여 여부를 확인해서 포인트를 지급
+    Attendance Check Serializer:
+    Retrieves the last attendance check history to determine the current status.
+    Awards points based on consecutive participation.
     """
 
     consecutive_days = serializers.IntegerField(
-        help_text="연속 일수", required=False, default=0
+        help_text="Consecutive days", required=False, default=0
     )
 
     def to_internal_value(self, data):
-        # self.instance 의 check_in_date 가 어제가 아니면 0 으로 초기화
+        # If self.instance's check_in_date is not yesterday, reset to 0
         # [Why]
-        # Q. 왜 어제 체크인 날짜가 아닌 경우 0으로 초기화 하는가?
-        # A. 어제 체크인 날짜가 아닌 경우, 연속 출석이라고 할 수 없음
-        #    출석 체크는 하루에 한 번만 가능
+        # Q. Why reset to 0 if not checked in yesterday?
+        # A. If not checked in yesterday, it cannot be considered consecutive attendance.
+        #    Attendance check is only allowed once per day.
         data["consecutive_days"] = 0
         if (
             self.instance
@@ -32,13 +32,13 @@ class AttendanceCheckSerializer(serializers.ModelSerializer):
             and self.instance.consecutive_days
             < len(settings.ATTENDANCE_CHECK_REWARD_POINTS) - 1
         ):
-            # 어제 출석체크 한 경우 연속 일수를 1 증가
+            # If checked in yesterday, increment consecutive days by 1
             data["consecutive_days"] = self.instance.consecutive_days + 1
         return super().to_internal_value(data)
 
     def save(self, **kwargs):
         try:
-            # 오늘 출석 체크 이력을 생성하거나 존재한다면 조회
+            # Create or retrieve today's attendance check history if it exists
             user = self.context["request"].user
             self.instance, _ = AttendanceCheck.objects.get_or_create(
                 user=user,

@@ -15,16 +15,16 @@ TEST_REWARD_POINTS = [5, 5, 5, 10, 10, 10, 100]
 
 @override_settings(ATTENDANCE_CHECK_REWARD_POINTS=TEST_REWARD_POINTS)
 class AttendanceCheckSerializerTests(APITestCase):
-    """AttendanceCheckSerializer 테스트"""
+    """Tests for AttendanceCheckSerializer"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
         )
 
-        # 어제 출석 체크 생성
+        # Create yesterday's attendance check
         yesterday = timezone.now().date() - timedelta(days=1)
         self.yesterday_check = AttendanceCheck.objects.create(
             user=self.user,
@@ -32,8 +32,8 @@ class AttendanceCheckSerializerTests(APITestCase):
             consecutive_days=1,
         )
 
-    def test_성공__출석체크_정보가_올바르게_직렬화(self):
-        """출석체크 정보가 올바르게 직렬화되는지 테스트"""
+    def test_should_correctly_serialize_attendance_check_information(self):
+        """Test if attendance check information is serialized correctly"""
         serializer = AttendanceCheckSerializer(self.yesterday_check)
         data = serializer.data
 
@@ -43,38 +43,38 @@ class AttendanceCheckSerializerTests(APITestCase):
             data["consecutive_days"], self.yesterday_check.consecutive_days
         )
 
-    def test_성공__연속_일수_검증(self):
-        """연속 일수 검증 성공 테스트"""
+    def test_should_validate_consecutive_days_successfully(self):
+        """Test successful validation of consecutive days"""
         serializer = AttendanceCheckSerializer(self.yesterday_check, data={})
         self.assertTrue(serializer.is_valid())
-        # 어제 출석했으므로 연속 일수가 1 증가해야 함
+        # Since checked in yesterday, consecutive days should increment by 1
         self.assertEqual(serializer.validated_data["consecutive_days"], 2)
 
-    def test_성공__연속_일수_초기화__어제_체크인_아님(self):
-        """어제 체크인이 아닌 경우 연속 일수 초기화 성공 테스트"""
-        # 2일 전 출석체크로 변경
+    def test_should_reset_consecutive_days_if_not_checked_in_yesterday(self):
+        """Test successful reset of consecutive days if not checked in yesterday"""
+        # Change to attendance check from 2 days ago
         self.yesterday_check.check_in_date = timezone.now().date() - timedelta(days=2)
         self.yesterday_check.save()
 
         serializer = AttendanceCheckSerializer(self.yesterday_check, data={})
         self.assertTrue(serializer.is_valid())
-        # 어제 출석하지 않았으므로 연속 일수가 0으로 초기화되어야 함
+        # Since not checked in yesterday, consecutive days should reset to 0
         self.assertEqual(serializer.validated_data["consecutive_days"], 0)
 
-    def test_성공__연속_일수_초기화__최대_일수_도달(self):
-        """최대 연속 일수 도달 시 초기화 성공 테스트"""
-        # 최대 연속 일수로 설정
+    def test_should_reset_consecutive_days_on_reaching_max_days(self):
+        """Test successful reset of consecutive days on reaching maximum days"""
+        # Set to maximum consecutive days
         max_days = len(settings.ATTENDANCE_CHECK_REWARD_POINTS)
         self.yesterday_check.consecutive_days = max_days
         self.yesterday_check.save()
 
         serializer = AttendanceCheckSerializer(self.yesterday_check, data={})
         self.assertTrue(serializer.is_valid())
-        # 최대 연속 일수에 도달했으므로 연속 일수가 0으로 초기화되어야 함
+        # Since maximum consecutive days reached, consecutive days should reset to 0
         self.assertEqual(serializer.validated_data["consecutive_days"], 0)
 
-    def test_성공__출석체크_업데이트(self):
-        """출석체크 업데이트 성공 테스트"""
+    def test_should_update_attendance_check_successfully(self):
+        """Test successful update of attendance check"""
         request = APIClient().request()
         request.user = self.user
         serializer = AttendanceCheckSerializer(
@@ -82,14 +82,14 @@ class AttendanceCheckSerializerTests(APITestCase):
         )
         self.assertTrue(serializer.is_valid())
 
-        # 업데이트 수행
+        # Perform update
         updated_check = serializer.save()
 
-        # 오늘 날짜로 새로운 출석체크가 생성되었는지 확인
+        # Check if new attendance check for today is created
         self.assertEqual(updated_check.check_in_date, timezone.now().date())
-        self.assertEqual(updated_check.consecutive_days, 2)  # 연속 일수 증가
+        self.assertEqual(updated_check.consecutive_days, 2)  # Consecutive days incremented
 
-        # 포인트가 지급되었는지 확인
+        # Check if points were awarded
         point = GamePoint.objects.filter(
             user=self.user, reason=PointReason.ATTENDANCE_CHECK
         ).last()
@@ -99,10 +99,10 @@ class AttendanceCheckSerializerTests(APITestCase):
 
 @override_settings(ATTENDANCE_CHECK_REWARD_POINTS=TEST_REWARD_POINTS)
 class AttendanceCheckViewSetTests(APITestCase):
-    """AttendanceCheckViewSet 테스트"""
+    """Tests for AttendanceCheckViewSet"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -110,7 +110,7 @@ class AttendanceCheckViewSetTests(APITestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
-        # 어제 출석 체크 생성
+        # Create yesterday's attendance check
         yesterday = timezone.now().date() - timedelta(days=1)
         self.yesterday_check = AttendanceCheck.objects.create(
             user=self.user,
@@ -118,15 +118,15 @@ class AttendanceCheckViewSetTests(APITestCase):
             consecutive_days=1,
         )
 
-        # API 경로
+        # API path
         self.attendance_check_url = "/v1/game/attendance-check/"
 
-    def test_성공__마지막_출석체크_조회(self):
-        """마지막 출석체크 조회 성공 테스트"""
+    def test_should_retrieve_last_attendance_check_successfully(self):
+        """Test successful retrieval of last attendance check"""
         response = self.client.get(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # 마지막 출석체크 정보 확인
+        # Check last attendance check information
         self.assertEqual(response.data["id"], self.yesterday_check.id)
         self.assertEqual(
             response.data["check_in_date"], str(self.yesterday_check.check_in_date)
@@ -135,39 +135,39 @@ class AttendanceCheckViewSetTests(APITestCase):
             response.data["consecutive_days"], self.yesterday_check.consecutive_days
         )
 
-    def test_성공__출석체크_참여(self):
-        """출석체크 참여 성공 테스트"""
+    def test_should_participate_in_attendance_check_successfully(self):
+        """Test successful participation in attendance check"""
         response = self.client.post(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # 출석체크 결과 확인
+        # Check attendance check result
         self.assertEqual(response.data["check_in_date"], str(timezone.now().date()))
-        self.assertEqual(response.data["consecutive_days"], 2)  # 연속 일수 증가
+        self.assertEqual(response.data["consecutive_days"], 2)  # Consecutive days incremented
 
-        # 포인트가 지급되었는지 확인
+        # Check if points were awarded
         point = GamePoint.objects.filter(
             user=self.user, reason=PointReason.ATTENDANCE_CHECK
         ).last()
         self.assertIsNotNone(point)
         self.assertEqual(point.point, TEST_REWARD_POINTS[2])
 
-    def test_실패__중복_출석체크(self):
-        """같은 날 중복 출석체크 실패 테스트"""
-        # 첫 번째 출석체크
+    def test_should_return_existing_check_on_duplicate_attendance_check_on_same_day(self):
+        """Test failure of duplicate attendance check on the same day"""
+        # First attendance check
         response = self.client.post(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["check_in_date"], str(timezone.now().date()))
         self.assertEqual(response.data["consecutive_days"], 2)
 
-        # 두 번째 출석체크 (같은 날)
+        # Second attendance check (same day)
         response = self.client.post(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["check_in_date"], str(timezone.now().date()))
         self.assertEqual(response.data["consecutive_days"], 2)
 
-    def test_실패__미인증_사용자(self):
-        """미인증 사용자 접근 거부 테스트"""
-        # 클라이언트에서 인증 정보 제거
+    def test_should_deny_access_for_unauthenticated_user(self):
+        """Test access denial for unauthenticated user"""
+        # Remove authentication information from client
         self.client.force_authenticate(user=None)
 
         response = self.client.get(self.attendance_check_url)
@@ -176,21 +176,21 @@ class AttendanceCheckViewSetTests(APITestCase):
         response = self.client.post(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_실패__PUT_메소드_거부(self):
-        """PUT 메소드 거부 테스트"""
+    def test_should_reject_put_method(self):
+        """Test rejection of PUT method"""
         response = self.client.put(self.attendance_check_url, {})
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_성공__연속_일수에_따른_포인트_지급(self):
-        """연속 일수에 따른 포인트 지급 테스트"""
-        # 연속 3일차 설정
+    def test_should_award_points_based_on_consecutive_days(self):
+        """Test awarding points based on consecutive days"""
+        # Set to 3rd consecutive day
         self.yesterday_check.consecutive_days = 2
         self.yesterday_check.save()
 
         response = self.client.post(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # 3일차 포인트 지급 확인
+        # Check if points for 3rd day were awarded
         point = GamePoint.objects.filter(
             user=self.user, reason=PointReason.ATTENDANCE_CHECK
         ).last()
@@ -199,10 +199,10 @@ class AttendanceCheckViewSetTests(APITestCase):
 
 
 class AttendanceCheckRoleAPIViewTests(APITestCase):
-    """AttendanceCheckRoleAPIView 테스트"""
+    """Tests for AttendanceCheckRoleAPIView"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -210,21 +210,21 @@ class AttendanceCheckRoleAPIViewTests(APITestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
-        # API 경로
+        # API path
         self.attendance_check_role_url = "/v1/game/attendance-check/role/"
 
     @override_settings(ATTENDANCE_CHECK_REWARD_POINTS=TEST_REWARD_POINTS)
-    def test_성공__출석체크_룰_조회(self):
-        """출석체크 룰 조회 성공 테스트"""
+    def test_should_retrieve_attendance_check_rules_successfully(self):
+        """Test successful retrieval of attendance check rules"""
         response = self.client.get(self.attendance_check_role_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # 출석체크 룰이 반환되는지 확인
+        # Check if attendance check rules are returned
         self.assertEqual(response.data, TEST_REWARD_POINTS)
 
-    def test_실패__미인증_사용자(self):
-        """미인증 사용자 접근 거부 테스트"""
-        # 클라이언트에서 인증 정보 제거
+    def test_should_deny_access_for_unauthenticated_user_when_retrieving_rules(self):
+        """Test access denial for unauthenticated user when retrieving rules"""
+        # Remove authentication information from client
         self.client.force_authenticate(user=None)
 
         response = self.client.get(self.attendance_check_role_url)
@@ -232,26 +232,26 @@ class AttendanceCheckRoleAPIViewTests(APITestCase):
 
 
 class GamePointTests(APITestCase):
-    """GamePoint 모델 테스트"""
+    """Tests for GamePoint model"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
         )
 
     @override_settings(ATTENDANCE_CHECK_REWARD_POINTS=TEST_REWARD_POINTS)
-    def test_성공__출석체크_포인트_지급(self):
-        """출석체크를 통한 포인트 지급 테스트"""
-        # 출석체크 생성
+    def test_should_award_points_for_attendance_check(self):
+        """Test awarding points through attendance check"""
+        # Create attendance check
         AttendanceCheck.objects.create(
             user=self.user,
             check_in_date=timezone.now().date(),
             consecutive_days=0,
         )
 
-        # 포인트 생성 확인
+        # Check point creation
         point = GamePoint.objects.filter(
             user=self.user, reason=PointReason.ATTENDANCE_CHECK
         ).first()
@@ -260,32 +260,32 @@ class GamePointTests(APITestCase):
         self.assertEqual(point.point, int(TEST_REWARD_POINTS[0]))
         self.assertEqual(point.reason, PointReason.ATTENDANCE_CHECK)
 
-    def test_성공__다양한_이유로_포인트_지급(self):
-        """다양한 이유로 포인트 지급 테스트"""
-        # 출석체크 포인트
+    def test_should_award_points_for_various_reasons(self):
+        """Test awarding points for various reasons"""
+        # Attendance check points
         GamePoint.objects.create(
             user=self.user,
             point=10,
             reason=PointReason.ATTENDANCE_CHECK,
         )
 
-        # 동전 뒤집기 포인트
+        # Coin flip points
         GamePoint.objects.create(
             user=self.user,
             point=5,
             reason=PointReason.COIN_FLIP,
         )
 
-        # 포인트 개수 확인
+        # Check number of points
         self.assertEqual(GamePoint.objects.filter(user=self.user).count(), 2)
 
-        # 출석체크 포인트 확인
+        # Check attendance check points
         attendance_point = GamePoint.objects.filter(
             user=self.user, reason=PointReason.ATTENDANCE_CHECK
         ).first()
         self.assertEqual(attendance_point.point, 10)
 
-        # 동전 뒤집기 포인트 확인
+        # Check coin flip points
         coin_flip_point = GamePoint.objects.filter(
             user=self.user, reason=PointReason.COIN_FLIP
         ).first()
@@ -293,10 +293,10 @@ class GamePointTests(APITestCase):
 
 
 class AttendanceCheckEdgeCaseTests(APITestCase):
-    """AttendanceCheck 엣지 케이스 테스트"""
+    """Edge case tests for AttendanceCheck"""
 
     def setUp(self):
-        """테스트 데이터 설정"""
+        """Set up test data"""
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
@@ -304,26 +304,26 @@ class AttendanceCheckEdgeCaseTests(APITestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
-        # API 경로
+        # API path
         self.attendance_check_url = "/v1/game/attendance-check/"
 
     @override_settings(ATTENDANCE_CHECK_REWARD_POINTS=TEST_REWARD_POINTS)
-    def test_성공__첫_출석체크(self):
-        """첫 출석체크 성공 테스트"""
-        # 기존 출석체크 없음
+    def test_should_handle_first_attendance_check_successfully(self):
+        """Test successful handling of first attendance check"""
+        # No existing attendance check
         response = self.client.get(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("id"), None)
 
-        # 첫 출석체크 참여
+        # Participate in first attendance check
         response = self.client.post(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # 출석체크 결과 확인
+        # Check attendance check result
         self.assertEqual(response.data["check_in_date"], str(timezone.now().date()))
-        self.assertEqual(response.data["consecutive_days"], 0)  # 첫 출석이므로 0
+        self.assertEqual(response.data["consecutive_days"], 0)  # 0 for first attendance
 
-        # 포인트가 지급되었는지 확인
+        # Check if points were awarded
         point = GamePoint.objects.filter(
             user=self.user, reason=PointReason.ATTENDANCE_CHECK
         ).first()
@@ -331,9 +331,9 @@ class AttendanceCheckEdgeCaseTests(APITestCase):
         self.assertEqual(point.point, TEST_REWARD_POINTS[0])
 
     @override_settings(ATTENDANCE_CHECK_REWARD_POINTS=TEST_REWARD_POINTS)
-    def test_성공__연속_출석_최대치_후_리셋(self):
-        """연속 출석 최대치 도달 후 리셋 테스트"""
-        # 최대 연속 일수 - 1로 설정 (마지막 날짜)
+    def test_should_reset_after_reaching_max_consecutive_attendance(self):
+        """Test reset after reaching maximum consecutive attendance"""
+        # Set to maximum consecutive days - 1 (last day)
         max_days = len(TEST_REWARD_POINTS) - 1
         yesterday = timezone.now().date() - timedelta(days=1)
 
@@ -343,14 +343,14 @@ class AttendanceCheckEdgeCaseTests(APITestCase):
             consecutive_days=max_days,
         )
 
-        # 출석체크 참여 (최대 일수 초과)
+        # Participate in attendance check (exceeding max days)
         response = self.client.post(self.attendance_check_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # 연속 일수가 0으로 리셋되었는지 확인
+        # Check if consecutive days reset to 0
         self.assertEqual(response.data["consecutive_days"], 0)
 
-        # 포인트가 지급되었는지 확인 (0일차 포인트)
+        # Check if points were awarded (points for day 0)
         point = GamePoint.objects.filter(
             user=self.user, reason=PointReason.ATTENDANCE_CHECK
         ).last()

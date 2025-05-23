@@ -15,7 +15,7 @@ class AgreementViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
 ):
-    """사용자 약관"""
+    """User Agreements"""
 
     queryset = Agreement.objects.filter(is_active=True)
     serializer_class = AgreementSerializer
@@ -27,9 +27,9 @@ class AgreementViewSet(
             200: AgreementSerializer,
         },
         tags=["account"],
-        summary="사용자 약관 목록",
+        summary="User Agreement List",
         description="""
-        사용자 약관 목록을 조회합니다.
+        Retrieves the list of user agreements.
         """,
     )
     def list(self, request, *args, **kwargs):
@@ -42,18 +42,18 @@ class UserAgreementViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
 ):
-    """사용자 약관 동의"""
+    """User Agreement Consent"""
 
     queryset = UserAgreement.objects.filter(agreement__is_active=True)
     serializer_class = UserAgreementSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """쿼리셋 조회"""
+        """Retrieve queryset"""
         return self.queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
-        """시리얼라이저 클래스 조회"""
+        """Retrieve serializer class"""
         if self.action == "create":
             return UserAgreementCreateSerializer
         return super().get_serializer_class()
@@ -63,9 +63,9 @@ class UserAgreementViewSet(
             200: UserAgreementSerializer,
         },
         tags=["user"],
-        summary="사용자 약관 목록",
+        summary="User Agreement List",
         description="""
-        사용자 약관 목록을 조회합니다.
+        Retrieves the list of user agreements.
         """,
     )
     def list(self, request, *args, **kwargs):
@@ -77,9 +77,9 @@ class UserAgreementViewSet(
             201: UserAgreementCreateSerializer,
         },
         tags=["user"],
-        summary="사용자 약관 동의",
+        summary="User Agreement Consent",
         description="""
-        사용자 약관에 동의합니다. 
+        Agrees to the user agreements.
         """,
     )
     def create(self, request, *args, **kwargs):
@@ -95,9 +95,9 @@ class UserAgreementViewSet(
             200: UserAgreementSerializer,
         },
         tags=["user"],
-        summary="사용자 약관 동의 업데이트",
+        summary="Update User Agreement Consent",
         description="""
-        사용자 약관 동의 정보를 업데이트합니다.
+        Updates the user agreement consent information.
         """,
     )
     def partial_update(self, request, *args, **kwargs):

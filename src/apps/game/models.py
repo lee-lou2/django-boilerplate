@@ -3,30 +3,30 @@ from django.db import models
 
 
 class AttendanceCheck(models.Model):
-    """사용자 출석 체크 이력"""
+    """User Attendance Check History"""
 
     user = models.ForeignKey(
         "user.User",
         on_delete=models.CASCADE,
         related_name="attendance_checks",
-        verbose_name="사용자",
+        verbose_name="User",
     )
     check_in_date = models.DateField(
-        verbose_name="참여 일자",
+        verbose_name="Participation Date",
         db_index=True,
     )
     consecutive_days = models.PositiveIntegerField(
-        verbose_name="연속 일수",
+        verbose_name="Consecutive Days",
         default=0,
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            # 연속 일수에 해당하는 포인트 지급
+            # Award points corresponding to consecutive days
             reward_point = settings.ATTENDANCE_CHECK_REWARD_POINTS[
                 self.consecutive_days
             ]
@@ -39,41 +39,41 @@ class AttendanceCheck(models.Model):
 
     class Meta:
         db_table = "attendance_check"
-        verbose_name = "출석 체크 이력"
-        verbose_name_plural = verbose_name
+        verbose_name = "Attendance Check History"
+        verbose_name_plural = "Attendance Check Histories"
         unique_together = ["user", "check_in_date"]
 
 
 class PointReason(models.IntegerChoices):
-    """포인트 발급 사유"""
+    """Point Issuance Reason"""
 
-    ATTENDANCE_CHECK = 1, "출석 체크"
-    COIN_FLIP = 2, "동전 뒤집기"
+    ATTENDANCE_CHECK = 1, "Attendance Check"
+    COIN_FLIP = 2, "Coin Flip"
 
 
 class GamePoint(models.Model):
-    """게임 포인트"""
+    """Game Points"""
 
     user = models.ForeignKey(
         "user.User",
         on_delete=models.CASCADE,
         related_name="game_points",
-        verbose_name="사용자",
+        verbose_name="User",
     )
     point = models.IntegerField(
-        verbose_name="포인트",
-        help_text="지급/차감 포인트",
+        verbose_name="Points",
+        help_text="Awarded/Deducted Points",
     )
     reason = models.PositiveSmallIntegerField(
         choices=PointReason.choices,
-        verbose_name="사유",
+        verbose_name="Reason",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
 
     class Meta:
         db_table = "game_point"
-        verbose_name = "게임 포인트"
-        verbose_name_plural = verbose_name
+        verbose_name = "Game Points"
+        verbose_name_plural = "Game Points"

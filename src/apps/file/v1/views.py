@@ -21,7 +21,7 @@ class FileViewSet(
     mixins.UpdateModelMixin,
     mixins.ListModelMixin,
 ):
-    """파일 업로드 뷰셋"""
+    """File Upload ViewSet"""
 
     queryset = File.objects.exclude(status=FileStatus.DELETE)
     serializer_class = FileUploadSerializer
@@ -30,14 +30,14 @@ class FileViewSet(
     throttle_scope = "file"
 
     def get_throttles(self):
-        """요청 속도 제한 설정"""
+        """Set request rate limit"""
         if self.action in ["create", "partial_update", "presigned"]:
             self.throttle_scope = f"{self.throttle_scope}:{self.action}"
             return [ScopedRateThrottle()]
         return super().get_throttles()
 
     def get_queryset(self):
-        """쿼리셋 조회"""
+        """Retrieve queryset"""
         now = timezone.now()
         return (
             super()
@@ -49,7 +49,7 @@ class FileViewSet(
         )
 
     def get_serializer_class(self):
-        """시리얼라이저 클래스 설정"""
+        """Set serializer class"""
         if self.action == "partial_update":
             return FileUpdateSerializer
         elif self.action == "presigned":
@@ -64,10 +64,10 @@ class FileViewSet(
             201: FileUploadSerializer,
         },
         tags=["file"],
-        summary="파일 생성, 프리사인드 생성",
+        summary="Create File, Generate Presigned URL",
         description="""
-        파일의 기본 정보를 저장합니다
-        파일 업로드를 위한 프리사인드 URL을 생성합니다
+        Saves basic file information.
+        Generates a presigned URL for file upload.
         """,
     )
     def create(self, request, *args, **kwargs):
@@ -83,10 +83,9 @@ class FileViewSet(
             200: FileUpdateSerializer,
         },
         tags=["file"],
-        summary="파일 상태 변경",
+        summary="Change File Status",
         description="""
-        프리사인드 URL을 이용하여 파일을 업로드한 후
-        파일의 상태를 변경합니다
+        Changes the file status after uploading the file using the presigned URL.
         """,
     )
     def partial_update(self, request, *args, **kwargs):
@@ -99,9 +98,9 @@ class FileViewSet(
             200: FileDownloadSerializer,
         },
         tags=["file"],
-        summary="파일 다운로드 리스트 조회",
+        summary="Retrieve File Download List",
         description="""
-        지정한 콘텐츠의 파일 리스트를 출력합니다
+        Outputs the list of files for the specified content.
         """,
     )
     def list(self, request, *args, **kwargs):
@@ -113,9 +112,9 @@ class FileViewSet(
             200: FileDownloadPresignedSerializer,
         },
         tags=["file"],
-        summary="파일 다운로드, 프리사인드 생성",
+        summary="Download File, Generate Presigned URL",
         description="""
-        파일 다운로드를 위한 프리사인드 URL을 생성합니다
+        Generates a presigned URL for file download.
         """,
     )
     @action(

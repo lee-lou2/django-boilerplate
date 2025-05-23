@@ -5,26 +5,26 @@ from apps.user.models import User
 
 
 class AgreementType(models.IntegerChoices):
-    """약관 타입"""
+    """Agreement Type"""
 
-    SERVICES = 1, "서비스 약관"
-    PRIVACY = 2, "개인정보 처리 방침"
-    MARKETING = 3, "마케팅 약관"
+    SERVICES = 1, "Terms of Service"
+    PRIVACY = 2, "Privacy Policy"
+    MARKETING = 3, "Marketing Agreement"
 
 
 class Agreement(models.Model):
-    """약관 정보"""
+    """Agreement Information"""
 
     title = models.CharField(
         max_length=100,
-        verbose_name="약관 제목",
+        verbose_name="Agreement Title",
     )
     content = models.TextField(
-        verbose_name="약관 내용",
+        verbose_name="Agreement Content",
     )
     version = models.CharField(
         max_length=20,
-        verbose_name="약관 버전",
+        verbose_name="Agreement Version",
     )
     previous_version = models.ForeignKey(
         "self",
@@ -32,54 +32,54 @@ class Agreement(models.Model):
         null=True,
         blank=True,
         related_name="next_versions",
-        verbose_name="이전 버전",
-        help_text="이 약관 개정 전의 이전 버전 약관을 참조합니다.",
+        verbose_name="Previous Version",
+        help_text="Refers to the previous version of the agreement before this revision.",
     )
     agreement_type = models.IntegerField(
         choices=AgreementType.choices,
-        verbose_name="약관 타입",
-        help_text="1: 서비스 약관, 2: 개인정보 처리 방침, 3: 마케팅 약관",
+        verbose_name="Agreement Type",
+        help_text="1: Terms of Service, 2: Privacy Policy, 3: Marketing Agreement",
     )
     order = models.IntegerField(
         default=0,
-        verbose_name="약관 순서",
-        help_text="약관 목록에서 표시되는 순서입니다.",
+        verbose_name="Agreement Order",
+        help_text="The order in which it is displayed in the agreement list.",
     )
     is_required = models.BooleanField(
         default=False,
-        verbose_name="필수 동의 여부",
-        help_text="사용자가 동의해야 하는 필수 약관인지 여부를 나타냅니다.",
+        verbose_name="Is Required",
+        help_text="Indicates whether this is a mandatory agreement that the user must consent to.",
     )
     is_active = models.BooleanField(
         default=True,
-        verbose_name="활성화 여부",
+        verbose_name="Is Active",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
 
     def save(self, *args, **kwargs):
-        # 수정 불가
+        # Cannot be modified
         # [Why]
-        # Q. 수정을 막는 이유는?
-        # A. 약관은 법적 효력이 있는 문서이기 때문에, 수정 시에는 새로운 버전으로 등록해야 합니다.
+        # Q. Why is modification prevented?
+        # A. Agreements are legally binding documents, so any modifications require registration as a new version.
         if self.pk:
-            raise ValueError("약관은 수정할 수 없습니다. 새로운 버전으로 등록하세요.")
+            raise ValueError("Agreements cannot be modified. Please register as a new version.")
 
-        # 이전 버전이 존재하고 활성화된 경우 비활성화
+        # Deactivate previous version if it exists and is active
         # [Why]
-        # Q. 약관 개정 시 이전 버전은 비활성화해야 하는가?
-        # A. 예, 약관 개정 시 이전 버전은 비활성화해야함
-        #    사용자가 이전 버전의 약관에 동의한 경우에도, 새로운 약관이 적용되도록 하기 위함
+        # Q. Should the previous version be deactivated upon agreement revision?
+        # A. Yes, upon agreement revision, the previous version should be deactivated
+        #    to ensure the new agreement applies even if users consented to the previous version.
         if self.previous_version and self.is_active and self.previous_version.is_active:
             self.previous_version.is_active = False
             self.previous_version.save()
 
-            # 이미 해당 예전 약관을 동의한 사람들에게 재동의 요청 푸시/이메일 발송 예약
+            # Schedule push/email notification for re-consent to users who agreed to the previous version
             # [Why]
-            # Q. 왜 재동의 요청을 해야 하는가?
-            # A. 약관은 법적 효력이 있는 문서이기 때문에, 개정 시에는 사용자에게 재동의 요청을 해야함
+            # Q. Why is re-consent required?
+            # A. Agreements are legally binding, so revisions require users to re-consent.
             task_send_re_agreement_notification.apply_async(
                 args=[self.previous_version, self],
             )
@@ -87,67 +87,67 @@ class Agreement(models.Model):
 
     class Meta:
         db_table = "agreement"
-        verbose_name = "약관 정보"
-        verbose_name_plural = "약관 정보"
+        verbose_name = "Agreement Information"
+        verbose_name_plural = "Agreement Information"
 
 
 class UserAgreement(models.Model):
-    """사용자 약관 동의 정보"""
+    """User Agreement Information"""
 
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="user_agreements",
-        verbose_name="사용자",
+        verbose_name="User",
     )
     agreement = models.ForeignKey(
         Agreement,
         on_delete=models.CASCADE,
         related_name="user_agreements",
-        verbose_name="약관",
+        verbose_name="Agreement",
     )
     is_agreed = models.BooleanField(
         default=False,
-        verbose_name="동의 여부",
+        verbose_name="Is Agreed",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "user_agreement"
-        verbose_name = "사용자 약관 동의 정보"
-        verbose_name_plural = "사용자 약관 동의 정보"
+        verbose_name = "User Agreement Information"
+        verbose_name_plural = "User Agreement Information"
         unique_together = ["user", "agreement"]
 
 
 class UserAgreementHistory(models.Model):
     """
-    사용자 약관 동의 이력:
-    약관 정보가 변경될 경우 어떤 값이 어떻게 변경되었는지에 대한 기록 필요
+    User Agreement History:
+    A record of what changed when agreement information is modified is necessary.
     """
 
     user_agreement = models.ForeignKey(
         UserAgreement,
         on_delete=models.CASCADE,
         related_name="history",
-        verbose_name="사용자 약관 동의 정보",
+        verbose_name="User Agreement Information",
     )
     data = models.JSONField(
-        verbose_name="변경 전 사용자 약관 동의 정보",
-        help_text="변경 전 사용자 약관 동의 정보(변경 일시, 동의 여부, 약관 정보 등)",
+        verbose_name="User agreement information before change",
+        help_text="User agreement information before change (change date, consent status, agreement details, etc.)",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
 
     class Meta:
         db_table = "user_agreement_history"
-        verbose_name = "사용자 약관 동의 이력"
-        verbose_name_plural = "사용자 약관 동의 이력"
+        verbose_name = "User Agreement History"
+        verbose_name_plural = "User Agreement History"

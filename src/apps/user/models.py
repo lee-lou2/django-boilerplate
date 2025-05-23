@@ -11,10 +11,10 @@ from common.fields.encrypt import EncryptedCharField
 
 
 class UserManager(BaseUserManager):
-    """사용자 매니저"""
+    """User Manager"""
 
     def create_user(self, email, password=None, **extra_fields) -> "User":
-        """기본 사용자 생성"""
+        """Create basic user"""
         if not email:
             raise ValueError("required email")
 
@@ -25,7 +25,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields) -> "User":
-        """슈퍼 사용자 생성"""
+        """Create superuser"""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -38,7 +38,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """사용자"""
+    """User"""
 
     uuid = models.UUIDField(
         default=uuid7,
@@ -48,31 +48,31 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     email = models.EmailField(
         unique=True,
-        verbose_name="이메일",
+        verbose_name="Email",
     )
     agreements = models.ManyToManyField(
         "agreement.Agreement",
         through="agreement.UserAgreement",
         related_name="users",
-        verbose_name="약관 동의",
+        verbose_name="Agreement Consent",
         blank=True,
-        help_text="사용자가 동의한 약관",
+        help_text="Agreements the user has consented to",
     )
     is_verified = models.BooleanField(
         default=False,
-        verbose_name="이메일 인증 여부",
+        verbose_name="Email Verified",
     )
     is_active = models.BooleanField(
         default=True,
-        verbose_name="활성화 여부",
+        verbose_name="Is Active",
     )
     is_staff = models.BooleanField(
         default=False,
-        verbose_name="관리자 여부",
+        verbose_name="Is Staff",
     )
     date_joined = models.DateTimeField(
         default=timezone.now,
-        verbose_name="가입 일시",
+        verbose_name="Date Joined",
     )
 
     objects = UserManager()
@@ -85,99 +85,99 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = "user"
-        verbose_name = "사용자"
-        verbose_name_plural = "사용자"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
 
 
 class SocialUser(models.Model):
-    """소셜 사용자"""
+    """Social User"""
 
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="social_users",
-        verbose_name="사용자",
+        verbose_name="User",
     )
     provider = models.CharField(
         max_length=20,
-        verbose_name="소셜 제공자",
+        verbose_name="Social Provider",
     )
     social_id = models.CharField(
         max_length=100,
-        verbose_name="소셜 ID",
+        verbose_name="Social ID",
     )
     user_data = EncryptedCharField(
         max_length=1000,
-        verbose_name="소셜 사용자 데이터",
+        verbose_name="Social User Data",
         null=True,
         blank=True,
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "social_user"
-        verbose_name = "소셜 사용자"
-        verbose_name_plural = "소셜 사용자"
+        verbose_name = "Social User"
+        verbose_name_plural = "Social Users"
         unique_together = ["user", "provider"]
 
 
 class UserProfile(models.Model):
-    """사용자 프로필"""
+    """User Profile"""
 
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name="profile",
-        verbose_name="사용자",
+        verbose_name="User",
     )
     nickname = models.CharField(
         unique=True,
         max_length=30,
-        verbose_name="닉네임",
+        verbose_name="Nickname",
     )
     image = models.URLField(
-        verbose_name="프로필 이미지",
+        verbose_name="Profile Image",
         null=True,
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "user_profile"
-        verbose_name = "사용자 프로필"
-        verbose_name_plural = "사용자 프로필"
+        verbose_name = "User Profile"
+        verbose_name_plural = "User Profiles"
 
 
-# TODO: 본인 인증 로직 구현 필요
+# TODO: Need to implement identity verification logic
 class UserVerification(models.Model):
-    """사용자 본인 인증 정보"""
+    """User Identity Verification Information"""
 
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name="verification",
-        verbose_name="사용자",
+        verbose_name="User",
     )
     name = EncryptedCharField(
         max_length=30,
-        verbose_name="암호화된 이름",
+        verbose_name="Encrypted Name",
     )
     phone = EncryptedCharField(
         max_length=30,
-        verbose_name="안호화된 전화번호",
+        verbose_name="Encrypted Phone Number",
     )
     ci = models.CharField(
         max_length=100,
@@ -189,50 +189,50 @@ class UserVerification(models.Model):
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "user_verification"
-        verbose_name = "사용자 본인 인증 정보"
-        verbose_name_plural = "사용자 본인 인증 정보"
+        verbose_name = "User Identity Verification Information"
+        verbose_name_plural = "User Identity Verification Information"
 
 
 class UserPreference(models.Model):
-    """사용자 선호 정보"""
+    """User Preference Information"""
 
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name="preference",
-        verbose_name="사용자",
+        verbose_name="User",
     )
     is_night_notification = models.BooleanField(
         default=False,
-        verbose_name="야간 수신 동의",
+        verbose_name="Night Notification Consent",
     )
     is_push_notification = models.BooleanField(
         default=True,
-        verbose_name="푸시 알림 동의",
+        verbose_name="Push Notification Consent",
     )
     is_email_notification = models.BooleanField(
         default=True,
-        verbose_name="이메일 알림 동의",
+        verbose_name="Email Notification Consent",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "user_preference"
-        verbose_name = "사용자 선호 정보"
-        verbose_name_plural = "사용자 선호 정보"
+        verbose_name = "User Preference Information"
+        verbose_name_plural = "User Preference Information"

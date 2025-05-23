@@ -11,8 +11,8 @@ from common.enums.errors import (
 
 class AgreementSerializer(serializers.ModelSerializer):
     """
-    약관 리스트 시리얼라이저:
-    현재 유효한 약관을 조회
+    Agreement List Serializer:
+    Retrieves currently valid agreements.
     """
 
     class Meta:
@@ -30,14 +30,14 @@ class AgreementSerializer(serializers.ModelSerializer):
 
 class UserAgreementSerializer(serializers.ModelSerializer):
     """
-    사용자 약관 동의 시리얼라이저:
-    내가 동의/미동의한 약관 리스트 조회 및 업데이트
+    User Agreement Consent Serializer:
+    Retrieves and updates the list of agreements I have agreed/disagreed to.
     """
 
-    agreement = AgreementSerializer(read_only=True, help_text="약관 정보")
+    agreement = AgreementSerializer(read_only=True, help_text="Agreement information")
 
     def validate_is_agreed(self, attr):
-        # 필수 약관의 경우 is_agreed가 True여야 함
+        # For required agreements, is_agreed must be True
         if self.instance.agreement.is_required and not attr:
             raise serializers.ValidationError(E009_AGREEMENT_REQUIRED)
         return attr
@@ -48,7 +48,7 @@ class UserAgreementSerializer(serializers.ModelSerializer):
             "updated_at": instance.updated_at.timestamp(),
         }
         instance = super().update(instance, validated_data)
-        # 이 전 기록 저장
+        # Save previous record
         UserAgreementHistory.objects.create(
             user_agreement=instance,
             data=before_data,
@@ -62,40 +62,40 @@ class UserAgreementSerializer(serializers.ModelSerializer):
 
 class UserAgreementCreateItemSerializer(serializers.Serializer):
     """
-    사용자 약관 동의 내부 항목 시리얼라이저:
-    회원 가입 시 리스트에 있는 각 약관 항목
+    User Agreement Consent Internal Item Serializer:
+    Each agreement item in the list during user registration.
     """
 
-    id = serializers.IntegerField(help_text="약관 ID")
-    is_agreed = serializers.BooleanField(help_text="약관 동의 여부")
+    id = serializers.IntegerField(help_text="Agreement ID")
+    is_agreed = serializers.BooleanField(help_text="Agreement consent status")
 
 
 class UserAgreementCreateSerializer(serializers.Serializer):
     """
-    사용자 약관 동의 시리얼라이저:
-    회원 가입 시 리스트에 있는 약관들을 동의
+    User Agreement Consent Serializer:
+    Consents to the agreements in the list during user registration.
     """
 
     agreements = serializers.ListField(
         child=UserAgreementCreateItemSerializer(),
         required=True,
         write_only=True,
-        help_text="사용자 약관 동의 정보",
+        help_text="User agreement consent information",
     )
 
     def validate_agreements(self, attrs):
         for attr in attrs:
-            # 1. id, is_agreed 필드가 있는지 확인
+            # 1. Check if id and is_agreed fields exist
             if "id" not in attr or "is_agreed" not in attr:
                 raise serializers.ValidationError(E009_AGREEMENT_ID_REQUIRED)
-            # 2. 존재하는 약관인지 확인
+            # 2. Check if the agreement exists
             agreement = Agreement.objects.filter(id=attr["id"]).first()
             if not agreement:
                 raise serializers.ValidationError(E009_AGREEMENT_NOT_FOUND)
-            # 3. 필수 약관인데 동의하지 않았는지 확인
+            # 3. Check if a required agreement has not been agreed to
             if agreement.is_required and not attr["is_agreed"]:
                 raise serializers.ValidationError(E009_AGREEMENT_REQUIRED)
-        # 4. 활성화된 약관 중 포함되지 않은 약관이 있는지 확인
+        # 4. Check if there are any active agreements not included
         if (
             Agreement.objects.filter(is_active=True)
             .exclude(id__in=[item["id"] for item in attrs])
@@ -105,7 +105,7 @@ class UserAgreementCreateSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        # 약관 동의 정보 저장
+        # Save agreement consent information
         UserAgreement.objects.bulk_create(
             [
                 UserAgreement(

@@ -16,7 +16,7 @@ class NoticeViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
 ):
-    """공지사항 뷰셋"""
+    """Notice ViewSet"""
 
     queryset = Notice.objects.filter(is_published=True)
     serializer_class = NoticeSerializer
@@ -35,9 +35,9 @@ class NoticeViewSet(
             200: NoticeSerializer(many=True),
         },
         tags=["cms"],
-        summary="공지사항 리스트 조회",
+        summary="Retrieve Notice List",
         description="""
-        공지사항 리스트를 조회합니다.
+        Retrieves the list of notices.
         """,
     )
     @method_decorator(cache_page(60 * 5))
@@ -49,9 +49,9 @@ class NoticeViewSet(
             200: NoticeSerializer,
         },
         tags=["cms"],
-        summary="공지사항 상세 조회",
+        summary="Retrieve Notice Detail",
         description="""
-        공지사항 상세를 조회합니다.
+        Retrieves the details of a notice.
         """,
     )
     @method_decorator(cache_page(60 * 5))
@@ -64,7 +64,7 @@ class EventViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
 ):
-    """이벤트 뷰셋"""
+    """Event ViewSet"""
 
     queryset = Event.objects.filter(is_published=True)
     serializer_class = EventSerializer
@@ -83,9 +83,9 @@ class EventViewSet(
             200: EventSerializer(many=True),
         },
         tags=["cms"],
-        summary="이벤트 리스트 조회",
+        summary="Retrieve Event List",
         description="""
-        이벤트 리스트를 조회합니다.
+        Retrieves the list of events.
         """,
     )
     @method_decorator(cache_page(60 * 5))
@@ -97,9 +97,9 @@ class EventViewSet(
             200: EventSerializer,
         },
         tags=["cms"],
-        summary="이벤트 상세 조회",
+        summary="Retrieve Event Detail",
         description="""
-        이벤트 상세를 조회합니다.
+        Retrieves the details of an event.
         """,
     )
     @method_decorator(cache_page(60 * 5))
@@ -111,7 +111,7 @@ class FaqViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
 ):
-    """FAQ 뷰셋"""
+    """FAQ ViewSet"""
 
     queryset = Faq.objects.filter(is_published=True)
     serializer_class = FaqSerializer
@@ -123,9 +123,9 @@ class FaqViewSet(
             200: FaqSerializer(many=True),
         },
         tags=["cms"],
-        summary="FAQ 리스트 조회",
+        summary="Retrieve FAQ List",
         description="""
-        FAQ 리스트를 조회합니다.
+        Retrieves the list of FAQs.
         """,
     )
     @method_decorator(cache_page(60 * 5))
