@@ -10,39 +10,39 @@ from apps.file.v1.utils import (
 
 class FileUploadSerializer(serializers.ModelSerializer):
     """
-    파일 업로드 시리얼라이저:
-    파일 업로드 시 직접 업로드하지 않고 프리사인드를 이용해서 업로드
+    File Upload Serializer:
+    Uses presigned URLs for file uploads instead of direct uploads.
     """
 
     user = serializers.HiddenField(
-        default=serializers.CurrentUserDefault(), help_text="사용자"
+        default=serializers.CurrentUserDefault(), help_text="User"
     )
     url = serializers.CharField(
         read_only=True,
-        help_text="S3 업로드 URL",
+        help_text="S3 Upload URL",
         allow_null=True,
     )
     fields = serializers.JSONField(
         read_only=True,
-        help_text="S3 업로드 필드",
+        help_text="S3 Upload Fields",
         allow_null=True,
     )
 
     def create(self, validated_data):
         instance = super().create(validated_data)
-        # S3 파일 경로 저장
+        # Save S3 file path
         content_type = ""
         file_name = f"{instance.uuid}.{instance.extension}"
         now = timezone.now()
         object_key = (
             f"files/{content_type}/{now.year}/{now.month}/{now.day}/{file_name}"
         )
-        # 프리사인드 정보 추가
+        # Add presigned information
         # [Why]
-        # Q. S3 업로드 시 프리사인드 URL을 생성하는 이유는?
-        # A. 아무나, 어떤 파일이든 업로드할 수 없도록 하기 위함
-        #    프리사인드를 통해 권한이 있는 사용자만 업로드할 수 있도록 함
-        #    또한, 자신의 파일만 업로드할 수 있도록 하기 위함
+        # Q. Why generate a presigned URL for S3 upload?
+        # A. To prevent anyone from uploading any file.
+        #    Presigned URLs ensure that only authorized users can upload.
+        #    Also, to ensure users can only upload their own files.
         response = generate_upload_presigned_url(
             object_key=object_key,
             file_size=instance.file_size,
@@ -80,8 +80,8 @@ class FileUploadSerializer(serializers.ModelSerializer):
 
 class FileUpdateSerializer(serializers.ModelSerializer):
     """
-    파일 업데이트 시리얼라이저:
-    파일 업로드 후 상태 업데이트, 삭제 요청
+    File Update Serializer:
+    Updates status after file upload, handles delete requests.
     """
 
     class Meta:
@@ -91,8 +91,8 @@ class FileUpdateSerializer(serializers.ModelSerializer):
 
 class FileDownloadSerializer(serializers.ModelSerializer):
     """
-    파일 다운로드 시리얼라이저:
-    파일 다운로드 가능한 파일 리스트 조회
+    File Download Serializer:
+    Retrieves a list of files available for download.
     """
 
     class Meta:
@@ -112,38 +112,38 @@ class FileDownloadSerializer(serializers.ModelSerializer):
 
 class FileDownloadPresignedSerializer(serializers.ModelSerializer):
     """
-    파일 다운로드 프리사인드 시리얼라이저:
-    파일 다운로드 시 프리사인드를 이용해서 다운로드
+    File Download Presigned Serializer:
+    Uses presigned URLs for file downloads.
     """
 
     reason = serializers.CharField(
         write_only=True,
-        help_text="다운로드 사유",
+        help_text="Download reason",
     )
     url = serializers.CharField(
         read_only=True,
-        help_text="S3 업로드 URL",
+        help_text="S3 Download URL",
         allow_null=True,
     )
     fields = serializers.JSONField(
         read_only=True,
-        help_text="S3 업로드 필드",
+        help_text="S3 Download Fields",
         allow_null=True,
     )
 
     def update(self, instance, validated_data):
-        """파일 다운로드 프리사인드 URL 생성"""
+        """Generate file download presigned URL"""
         # [Why]
-        # Q. 파일 다운로드 시 프리사인드 URL을 생성하는 이유는?
-        # A. 아무나, 어떤 파일이든 다운로드할 수 없도록 하기 위함
-        #    프리사인드 URL을 통해 권한이 있는 사용자만 다운로드할 수 있도록 하기 위함
-        #    참고로, 모든 사람이 받아도 되는 파일은 CDN 을 통해 다운로드 가능하도록 설정
+        # Q. Why generate a presigned URL for file download?
+        # A. To prevent anyone from downloading any file.
+        #    Presigned URLs ensure that only authorized users can download.
+        #    Note: Files that anyone can download should be configured for download via CDN.
         response = generate_download_presigned_url(
             object_key=instance.object_key,
         )
         instance.fields = response.get("fields")
         instance.url = response.get("url")
-        # 파일 다운로드 기록
+        # Record file download
         FileDownloadHistory.objects.create(
             reason=validated_data.get("reason"),
             user=self.context["request"].user,

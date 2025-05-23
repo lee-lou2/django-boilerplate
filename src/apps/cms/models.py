@@ -3,7 +3,7 @@ from uuid_extensions import uuid7
 
 
 class Notice(models.Model):
-    """공지사항"""
+    """Notice"""
 
     uuid = models.UUIDField(
         primary_key=True,
@@ -14,55 +14,55 @@ class Notice(models.Model):
     author = models.ForeignKey(
         "user.User",
         on_delete=models.CASCADE,
-        verbose_name="작성자",
-        help_text="공지 작성자",
+        verbose_name="Author",
+        help_text="Notice author",
     )
     title = models.CharField(
         max_length=255,
-        verbose_name="제목",
-        help_text="제목",
+        verbose_name="Title",
+        help_text="Title",
     )
     content = models.TextField(
-        verbose_name="내용",
-        help_text="내용",
+        verbose_name="Content",
+        help_text="Content",
     )
     published_at = models.DateTimeField(
-        verbose_name="발행 일시",
-        help_text="공지 발행 일시",
+        verbose_name="Published At",
+        help_text="Notice publication date and time",
         db_index=True,
     )
-    # 표시 기간
+    # Display period
     start_at = models.DateTimeField(
-        verbose_name="시작 일시",
-        help_text="공지 시작 일시",
+        verbose_name="Start At",
+        help_text="Notice start date and time",
     )
     end_at = models.DateTimeField(
         null=True,
         blank=True,
-        verbose_name="종료 일시",
-        help_text="공지 종료 일시",
+        verbose_name="End At",
+        help_text="Notice end date and time",
     )
     is_published = models.BooleanField(
         default=False,
-        verbose_name="발행 여부",
+        verbose_name="Is Published",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "notice"
-        verbose_name = "공지사항"
-        verbose_name_plural = "공지사항"
+        verbose_name = "Notice"
+        verbose_name_plural = "Notices"
 
 
 class Event(models.Model):
-    """이벤트"""
+    """Event"""
 
     uuid = models.UUIDField(
         primary_key=True,
@@ -73,66 +73,66 @@ class Event(models.Model):
     author = models.ForeignKey(
         "user.User",
         on_delete=models.CASCADE,
-        verbose_name="작성자",
-        help_text="이벤트 작성자",
+        verbose_name="Author",
+        help_text="Event author",
     )
     title = models.CharField(
         max_length=255,
-        verbose_name="제목",
-        help_text="제목",
+        verbose_name="Title",
+        help_text="Title",
     )
     content = models.TextField(
-        verbose_name="내용",
-        help_text="내용",
+        verbose_name="Content",
+        help_text="Content",
     )
-    # 표시 기간
+    # Display period
     start_at = models.DateTimeField(
-        verbose_name="시작 일시",
-        help_text="이벤트 시작 일시",
+        verbose_name="Start At",
+        help_text="Event start date and time",
     )
     end_at = models.DateTimeField(
         null=True,
         blank=True,
-        verbose_name="종료 일시",
-        help_text="이벤트 종료 일시",
+        verbose_name="End At",
+        help_text="Event end date and time",
     )
-    # 이벤트 기간
+    # Event period
     event_start_at = models.DateTimeField(
-        verbose_name="이벤트 시작 일시",
-        help_text="이벤트 시작 일시",
+        verbose_name="Event Start At",
+        help_text="Actual event start date and time",
     )
     event_end_at = models.DateTimeField(
         null=True,
         blank=True,
-        verbose_name="이벤트 종료 일시",
-        help_text="이벤트 종료 일시",
+        verbose_name="Event End At",
+        help_text="Actual event end date and time",
     )
     is_published = models.BooleanField(
         default=False,
-        verbose_name="발행 여부",
+        verbose_name="Is Published",
     )
     published_at = models.DateTimeField(
-        verbose_name="발행 일시",
-        help_text="이벤트 발행 일시",
+        verbose_name="Published At",
+        help_text="Event publication date and time",
         db_index=True,
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "event"
-        verbose_name = "이벤트"
-        verbose_name_plural = "이벤트"
+        verbose_name = "Event"
+        verbose_name_plural = "Events"
 
 
 class FaqCategory(models.Model):
-    """FAQ 카테고리"""
+    """FAQ Category"""
 
     uuid = models.UUIDField(
         primary_key=True,
@@ -142,22 +142,22 @@ class FaqCategory(models.Model):
     )
     name = models.CharField(
         max_length=255,
-        verbose_name="카테고리 이름",
-        help_text="카테고리 이름",
+        verbose_name="Category Name",
+        help_text="Category name",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "faq_category"
-        verbose_name = "FAQ 카테고리"
-        verbose_name_plural = "FAQ 카테고리"
+        verbose_name = "FAQ Category"
+        verbose_name_plural = "FAQ Categories"
 
 
 class Faq(models.Model):
@@ -172,43 +172,43 @@ class Faq(models.Model):
     author = models.ForeignKey(
         "user.User",
         on_delete=models.CASCADE,
-        verbose_name="작성자",
-        help_text="FAQ 작성자",
+        verbose_name="Author",
+        help_text="FAQ author",
     )
     category = models.ForeignKey(
         FaqCategory,
         on_delete=models.CASCADE,
-        verbose_name="카테고리",
-        help_text="FAQ 카테고리",
+        verbose_name="Category",
+        help_text="FAQ category",
     )
     title = models.CharField(
         max_length=255,
-        verbose_name="제목",
-        help_text="제목",
+        verbose_name="Title",
+        help_text="Title",
     )
     content = models.TextField(
-        verbose_name="내용",
-        help_text="내용",
+        verbose_name="Content",
+        help_text="Content",
     )
     is_published = models.BooleanField(
         default=False,
-        verbose_name="발행 여부",
+        verbose_name="Is Published",
     )
     published_at = models.DateTimeField(
-        verbose_name="발행 일시",
-        help_text="FAQ 발행 일시",
+        verbose_name="Published At",
+        help_text="FAQ publication date and time",
         db_index=True,
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="생성 일시",
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="수정 일시",
+        verbose_name="Updated At",
     )
 
     class Meta:
         db_table = "faq"
         verbose_name = "FAQ"
-        verbose_name_plural = "FAQ"
+        verbose_name_plural = "FAQs"
