@@ -6,73 +6,73 @@ import os
 
 class AESCipher:
     """
-    AES-256 암호화 및 복호화를 수행하는 클래스.
-    CBC 모드를 사용하며, IV를 암호문 앞에 붙여 Base64로 인코딩합니다.
+    A class that performs AES-256 encryption and decryption.
+    It uses CBC mode and prepends the IV to the ciphertext before Base64 encoding.
     """
 
     def __init__(self, key: str):
         """
-        초기화 메서드.
+        Initialization method.
 
         Args:
-            key (str): 32바이트 길이의 AES-256 암호화 키 (문자열).
+            key (str): 32-byte AES-256 encryption key (string).
         Raises:
-            ValueError: 키 길이가 32바이트가 아닐 경우 발생합니다.
+            ValueError: Raised if the key length is not 32 bytes.
         """
         self.key = key.encode("utf-8")
         if len(self.key) != 32:
-            raise ValueError("AES-256 키는 반드시 32바이트여야 합니다.")
-        self.block_size = AES.block_size  # AES 블록 크기는 16바이트
+            raise ValueError("AES-256 key must be 32 bytes.")
+        self.block_size = AES.block_size  # AES block size is 16 bytes
 
     def encrypt(self, plaintext: str) -> str:
         """
-        주어진 평문을 AES-256으로 암호화합니다.
+        Encrypts the given plaintext using AES-256.
 
         Args:
-            plaintext (str): 암호화할 문자열.
+            plaintext (str): String to be encrypted.
 
         Returns:
-            str: Base64로 인코딩된 암호문 (IV 포함).
+            str: Base64 encoded ciphertext (including IV).
         """
         plaintext_bytes = plaintext.encode("utf-8")
 
-        # CBC 모드를 위한 랜덤 IV 생성 (16바이트)
+        # Generate random IV for CBC mode (16 bytes)
         iv = os.urandom(self.block_size)
 
-        # AES 암호화 객체 생성 (CBC 모드)
+        # Create AES cipher object (CBC mode)
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
 
-        # 평문 패딩 및 암호화
+        # Pad and encrypt plaintext
         padded_plaintext = pad(plaintext_bytes, self.block_size)
         ciphertext_bytes = cipher.encrypt(padded_plaintext)
 
-        # IV와 암호문 결합 후 Base64 인코딩
+        # Combine IV and ciphertext then Base64 encode
         encrypted_data = iv + ciphertext_bytes
         return base64.b64encode(encrypted_data).decode("utf-8")
 
     def decrypt(self, encrypted_text: str) -> str:
         """
-        Base64 인코딩된 암호문을 AES-256으로 복호화합니다.
+        Decrypts the Base64 encoded ciphertext using AES-256.
 
         Args:
-            encrypted_text (str): Base64로 인코딩된 암호문 (IV 포함).
+            encrypted_text (str): Base64 encoded ciphertext (including IV).
 
         Returns:
-            str: 복호화된 원본 문자열.
+            str: Decrypted original string.
         """
-        # Base64 디코딩
+        # Base64 decoding
         encrypted_data = base64.b64decode(encrypted_text)
 
-        # IV와 암호문 분리
+        # Separate IV and ciphertext
         iv = encrypted_data[: self.block_size]
         ciphertext_bytes = encrypted_data[self.block_size :]
 
-        # AES 복호화 객체 생성 (CBC 모드)
+        # Create AES cipher object (CBC mode)
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
 
-        # 복호화 및 패딩 제거
+        # Decrypt and remove padding
         decrypted_padded_bytes = cipher.decrypt(ciphertext_bytes)
         decrypted_bytes = unpad(decrypted_padded_bytes, self.block_size)
 
-        # UTF-8 문자열로 디코딩하여 반환
+        # Decode to UTF-8 string and return
         return decrypted_bytes.decode("utf-8")
