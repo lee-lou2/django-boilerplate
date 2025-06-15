@@ -30,9 +30,9 @@ class RegisterViewSet(
     mixins.CreateModelMixin,
 ):
     """
-    회원 가입
-    이메일 주소와 패스워드, 패스워드 확인 필드를 이용해서 회원 가입 신청
-    실제 회원 가입은 이메일 검증 이후 완료
+    User Registration
+    Request to register using email address, password, and password confirmation fields.
+    Actual registration is completed after email verification.
     """
 
     permission_classes = [permissions.AllowAny]
@@ -44,10 +44,10 @@ class RegisterViewSet(
             201: RegisterSerializer,
         },
         tags=["account"],
-        summary="회원 가입 - 이메일, 패스워드 검증, 생성 요청",
+        summary="User Registration - Email, password verification, creation request",
         description="""
-        이메일 주소와 패스워드, 패스워드 확인 필드를 이용해서 회원 가입 신청합니다.
-        실제 회원 가입은 이메일 검증 이후 완료됩니다.
+        Request to register using email address, password, and password confirmation fields.
+        Actual registration is completed after email verification.
         """,
     )
     def create(self, request, *args, **kwargs):
@@ -59,14 +59,14 @@ class RegisterViewSet(
                 name="hashed_email",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
-                description="해시된 이메일 값",
+                description="Hashed email value",
                 required=True,
             ),
             OpenApiParameter(
                 name="token",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
-                description="이메일 인증 토큰",
+                description="Email verification token",
                 required=True,
             ),
         ],
@@ -74,10 +74,10 @@ class RegisterViewSet(
             302: HttpResponsePermanentRedirect,
         },
         tags=["account"],
-        summary="회원 가입 - 이메일 검증",
+        summary="User Registration - Email verification",
         description="""
-        회원 가입 시 이메일을 통해 검증 코드와 해시된 이메일을 발송합니다.
-        여기서 받은 검증 코드와 해시된 이메일을 통해 이메일 검증을 수행합니다.
+        Sends a verification code and hashed email via email upon registration.
+        Email verification is performed using the received verification code and hashed email.
         """,
     )
     @action(detail=False, methods=["GET"], serializer_class=EmailVerificationSerializer)
@@ -94,20 +94,20 @@ class LoginViewSet(
     mixins.CreateModelMixin,
 ):
     """
-    로그인
-    이메일 주소와 패스워드를 이용해서 로그인
-    리프래시 토큰을 이용한 토큰 갱신
+    Login
+    Login using email address and password.
+    Token renewal using refresh token.
     """
 
     permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
 
     def perform_create(self, serializer):
-        # 실제 데이터 저장은 하지 않음
+        # Does not actually save data
         pass
 
     def get_permissions(self):
-        # 로그아웃 시 인증이 필요함
+        # Authentication is required for logout
         if self.action == "logout":
             return [permissions.IsAuthenticated()]
         return super().get_permissions()
@@ -118,10 +118,10 @@ class LoginViewSet(
             200: LoginSerializer,
         },
         tags=["account"],
-        summary="로그인",
+        summary="Login",
         description="""
-        이메일 주소와 패스워드를 이용해서 로그인합니다.
-        프로필이 등록되어이 있지 않은 경우 프로필 페이지로 이동됩니다.
+        Login using email address and password.
+        If profile is not registered, redirects to profile page.
         """,
     )
     @action(detail=False, methods=["POST"])
@@ -136,9 +136,9 @@ class LoginViewSet(
             200: RefreshTokenSerializer,
         },
         tags=["account"],
-        summary="리프래시 토큰 갱신",
+        summary="Refresh token renewal",
         description="""
-        리프래시 토큰을 이용해서 토큰을 갱신합니다.
+        Renews token using refresh token.
         """,
     )
     @action(detail=False, methods=["POST"], serializer_class=RefreshTokenSerializer)
@@ -153,10 +153,10 @@ class LoginViewSet(
             204: None,
         },
         tags=["account"],
-        summary="로그아웃",
+        summary="Logout",
         description="""
-        토큰을 이용해서 로그아웃합니다.
-        로그아웃 시 토큰이 무효화됩니다.
+        Logout using token.
+        Token is invalidated upon logout.
         """,
     )
     @action(detail=False, methods=["POST"], serializer_class=LogoutSerializer)
@@ -176,9 +176,9 @@ class PasswordViewSet(
     mixins.CreateModelMixin,
 ):
     """
-    비밀번호 초기화
-    이메일 주소 입력 시 해당 메일로 초기화 링크 전달
-    해시 이메일 주소, 토큰, 그리고 비밀번호를 전달하면 변경
+    Password Reset
+    Sends a reset link to the email address upon input.
+    Changes password when hashed email address, token, and password are provided.
     """
 
     permission_classes = [permissions.AllowAny]
@@ -190,9 +190,9 @@ class PasswordViewSet(
             200: PasswordResetSerializer,
         },
         tags=["account"],
-        summary="비밀번호 초기화 요청",
+        summary="Password reset request",
         description="""
-        이메일 주소로 비밀번호 초기화 링크를 전달합니다.
+        Sends a password reset link to the email address.
         """,
     )
     @action(detail=False, methods=["POST"])
@@ -207,9 +207,9 @@ class PasswordViewSet(
             200: PasswordChangeSerializer,
         },
         tags=["account"],
-        summary="비밀번호 변경",
+        summary="Password change",
         description="""
-        해싱된 이메일 주소, 토큰, 비밀번호를 이용해서 비밀번호를 변경합니다.
+        Changes password using hashed email address, token, and password.
         """,
     )
     @action(detail=False, methods=["POST"], serializer_class=PasswordChangeSerializer)
@@ -225,9 +225,9 @@ class PasswordViewSet(
 
 class GoogleLoginViewSet(viewsets.GenericViewSet):
     """
-    소셜 로그인 - 구글
-    구글 로그인 페이지로 이동
-    구글 로그인 콜백 정보로 가입 및 로그인 처리 등
+    Social Login - Google
+    Redirects to Google login page.
+    Handles registration and login using Google login callback information.
     """
 
     permission_classes = [permissions.AllowAny]
@@ -238,9 +238,9 @@ class GoogleLoginViewSet(viewsets.GenericViewSet):
             302: HttpResponseRedirect,
         },
         tags=["account"],
-        summary="구글 로그인 - 로그인 페이지로 이동",
+        summary="Google Login - Redirect to login page",
         description="""
-        구글 로그인 페이지로 이동합니다.
+        Redirects to Google login page.
         """,
     )
     @action(detail=False, methods=["get"], url_path="login")
@@ -253,11 +253,11 @@ class GoogleLoginViewSet(viewsets.GenericViewSet):
             200: GoogleLoginSerializer,
         },
         tags=["account"],
-        summary="구글 로그인",
+        summary="Google Login",
         description="""
-        구글 로그인 콜백 URL입니다.
-        인증된 이메일인 경우 토큰을 발급합니다.
-        인증되지 않은 이메일인 경우 인증 메일을 발송합니다.
+        Google login callback URL.
+        Issues token if email is verified.
+        Sends verification email if email is not verified.
         """,
     )
     @action(detail=False, methods=["GET"], serializer_class=GoogleLoginSerializer)

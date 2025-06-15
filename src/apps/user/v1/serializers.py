@@ -16,13 +16,13 @@ from common.enums.errors import (
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """
-    사용자 프로필 시리얼라이저:
-    닉네임 유효성 검사
-    프로필 등록
+    User Profile Serializer:
+    Nickname validation
+    Profile registration
     """
 
     NICKNAME_ALLOWED_CHARS_REGEX = re.compile(
-        r"^[a-zA-Z0-9가-힣\-_.+=^!\s"  # 기본 문자 + 허용 특수문자 + 공백
+        r"^[a-zA-Z0-9가-힣\-_.+=^!\s"  # Basic characters + allowed special characters + space
         r"\U0001F300-\U0001F5FF"  # Miscellaneous Symbols and Pictographs
         r"\U0001F600-\U0001F64F"  # Emoticons
         r"\U0001F680-\U0001F6FF"  # Transport and Map Symbols
@@ -37,48 +37,46 @@ class UserProfileSerializer(serializers.ModelSerializer):
     NICKNAME_FORBIDDEN_WORDS = {
         "admin",
         "administrator",
-        "관리자",
-        "운영자",
-        "어드민",
+        "operator",  # "관리자", "운영자" translated
     }
 
     def validate_nickname(self, value):
         """
-        닉네임 유효성 검사
-        1. 길이 검사 (2~30자)
-        2. 시작/끝 공백 검사
-        3. 연속 공백 검사
-        4. 허용된 문자/기호/이모티콘/공백 검사 (정규식)
-        5. 금지된 단어 검사 (admin, 관리자 등)
-        6. 비속어 검사
+        Nickname validation
+        1. Length check (2-30 characters)
+        2. Leading/trailing space check
+        3. Consecutive space check
+        4. Allowed characters/symbols/emojis/spaces check (regex)
+        5. Forbidden words check (admin, operator, etc.)
+        6. Profanity check
         """
-        # 1. 길이 검사
+        # 1. Length check
         if not (self.NICKNAME_MIN_LEN <= len(value) <= self.NICKNAME_MAX_LEN):
             raise serializers.ValidationError(E008_INVALID_NICKNAME_LENGTH)
 
-        # 2. 시작/끝 공백 검사
+        # 2. Leading/trailing space check
         if value.startswith(" ") or value.endswith(" "):
             raise serializers.ValidationError(E008_INVALID_NICKNAME_SPACING)
 
-        # 3. 연속 공백 검사
+        # 3. Consecutive space check
         if "  " in value:
             raise serializers.ValidationError(E008_INVALID_NICKNAME_CONSECUTIVE_SPACES)
 
-        # 4. 허용된 문자 조합 검사 (정규식)
-        #    - 정규식은 전체 문자열이 허용된 문자들로만 구성되었는지 확인
+        # 4. Allowed character combination check (regex)
+        #    - Regex checks if the entire string consists only of allowed characters
         if not self.NICKNAME_ALLOWED_CHARS_REGEX.match(value):
             raise serializers.ValidationError(E008_INVALID_NICKNAME_FORMAT)
 
-        # 5. 금지된 단어 검사 (대소문자 무시)
+        # 5. Forbidden words check (case-insensitive)
         if value.lower() in self.NICKNAME_FORBIDDEN_WORDS:
             raise serializers.ValidationError(E008_NICKNAME_CONTAINS_FORBIDDEN_WORD)
 
-        # 6. 비속어 검사
-        #    - better_profanity 는 영어 중심일 수 있으므로, 필요시 한국어 비속어 라이브러리 추가 고려
+        # 6. Profanity check
+        #    - better_profanity might be English-centric, consider adding a Korean profanity library if needed
         if profanity.contains_profanity(value):
             raise serializers.ValidationError(E008_NICKNAME_CONTAINS_PROFANITY)
 
-        return value  # 모든 검사를 통과하면 원래 값 반환
+        return value  # Return the original value if all checks pass
 
     class Meta:
         model = UserProfile
@@ -91,14 +89,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserPreferenceSerializer(serializers.ModelSerializer):
     """
-    사용자 선호도 시리얼라이저:
-    사용자 선호도 설정
-    추후 푸시 발송 시 사용
+    User Preference Serializer:
+    User preference settings
+    To be used for future push notifications
     """
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        # TODO: AWS SNS 의 구독 정보 업데이트
+        # TODO: Update subscription information for AWS SNS
         return instance
 
     class Meta:
