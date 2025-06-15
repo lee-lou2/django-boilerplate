@@ -2,7 +2,7 @@ import enum
 
 
 class DjangoEnvironment(enum.Enum):
-    """Django 환경"""
+    """Django environment"""
 
     LOCAL = "local"
     DEVELOP = "develop"

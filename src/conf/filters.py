@@ -1,7 +1,7 @@
 import logging
 import re
 
-# 민감 정보 키워드
+# Sensitive information keywords
 SENSITIVE_KEYWORDS = {
     "password",
     "access_token",
@@ -10,7 +10,7 @@ SENSITIVE_KEYWORDS = {
 
 
 class SensitiveFilter(logging.Filter):
-    """로깅시 민감 정보 마스킹 필터"""
+    """Filter for masking sensitive information during logging"""
 
     def filter(self, record):
         for keyword in SENSITIVE_KEYWORDS:
