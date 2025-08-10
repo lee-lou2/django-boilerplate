@@ -61,12 +61,13 @@
 git clone https://github.com/lee-lou2/django-boilerplate.git
 cd django-boilerplate
 
-# 가상환경 생성 및 활성화
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+# uv 설치 (미설치 시)
+# macOS (Homebrew 권장):
+#   brew install uv
+# 기타 환경: https://docs.astral.sh/uv/getting-started/ 참고
 
-# 의존성 설치
-pip install -r requirements.txt
+# 의존성 동기화 (자동으로 .venv 생성)
+uv sync
 
 # 소스 폴더로 이동
 cd src
@@ -79,10 +80,10 @@ cp .env.example .env
 # .env 파일 편집하여 데이터베이스, 이메일, S3 등 설정
 
 # 마이그레이션 실행
-python manage.py migrate
+uv run python manage.py migrate
 
 # 개발 서버 실행
-python manage.py runserver
+uv run python manage.py runserver
 ```
 
 ## 📚 문서
@@ -163,7 +164,8 @@ django-boilerplate/
 │   └── redis/                 # Redis 설정
 ├── docker-compose.yml         # Docker Compose 설정
 ├── Dockerfile                 # Docker 이미지 설정
-├── requirements.txt           # Python 의존성
+├── pyproject.toml             # 프로젝트 설정 및 의존성 관리 (uv)
+├── uv.lock                    # 의존성 잠금 파일
 └── README.md                  # 프로젝트 소개
 ```
 
