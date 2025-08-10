@@ -9,7 +9,7 @@ from common.enums.base import DjangoEnvironment
 from conf.utils import load_aws_parameters
 
 # 파이썬 버전 확인
-if sys.version_info.major != 3 or sys.version_info.minor != 12:
+if sys.version_info.major != 3 or sys.version_info.minor < 11:
     raise RuntimeError("파이썬 버전이 올바르지 않습니다")
 
 # 프로젝트 설정

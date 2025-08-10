@@ -61,12 +61,13 @@ An enterprise-grade Django boilerplate ready for immediate use in production env
 git clone https://github.com/lee-lou2/django-boilerplate.git
 cd django-boilerplate
 
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+# Install uv (if not installed)
+# macOS (Homebrew recommended):
+#   brew install uv
+# Other platforms: see https://docs.astral.sh/uv/getting-started/
 
-# Install dependencies
-pip install -r requirements.txt
+# Sync dependencies (automatically creates .venv)
+uv sync
 
 # Move to source folder
 cd src
@@ -79,10 +80,10 @@ cp .env.example .env
 # Edit .env file to configure database, email, S3, etc.
 
 # Run migrations
-python manage.py migrate
+uv run python manage.py migrate
 
 # Start development server
-python manage.py runserver
+uv run python manage.py runserver
 ```
 
 ## 📚 Documentation
@@ -163,7 +164,8 @@ django-boilerplate/
 │   └── redis/                 # Redis settings
 ├── docker-compose.yml         # Docker Compose settings
 ├── Dockerfile                 # Docker image settings
-├── requirements.txt           # Python dependencies
+├── pyproject.toml             # Project configuration and dependencies (uv)
+├── uv.lock                    # Dependency lock file
 └── README.md                  # Project introduction
 ```
 
