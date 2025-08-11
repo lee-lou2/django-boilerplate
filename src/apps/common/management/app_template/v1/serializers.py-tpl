@@ -1,0 +1,27 @@
+from rest_framework import serializers
+
+from apps.{{ app_name }}.models import {{ camel_case_app_name }}
+
+
+class {{ camel_case_app_name }}Serializer(serializers.ModelSerializer):
+    def to_internal_value(self, data):
+        return super().to_internal_value(data)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        return attrs
+
+    def create(self, validated_data):
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
+
+    def to_representation(self, instance):
+        return super().to_representation(instance)
+
+    class Meta:
+        model = {{ camel_case_app_name }}
+        fields = [
+            "id",
+        ]

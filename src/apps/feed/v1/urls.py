@@ -6,13 +6,13 @@ from apps.feed.v1.views import (
     FeedCommentViewSet,
 )
 
-router = routers.SimpleRouter()
-router.register("feed", FeedViewSet, basename="feed")
+feed_router = routers.SimpleRouter()
+feed_router.register("feed", FeedViewSet, basename="feed")
 
-feed_router = routers.NestedSimpleRouter(router, r"feed", lookup="feed")
-feed_router.register(r"comment", FeedCommentViewSet, basename="feed-comment")
+comment_router = routers.NestedSimpleRouter(feed_router, r"feed", lookup="feed")
+comment_router.register(r"comment", FeedCommentViewSet, basename="feed-comment")
 
 urlpatterns = [
-    path("", include(router.urls)),
     path("", include(feed_router.urls)),
+    path("", include(comment_router.urls)),
 ]

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from common.utils.aes_chipher import AESCipher
+from base.utils.aes_chipher import AESCipher
 
 
 class EncryptedCharField(models.CharField):

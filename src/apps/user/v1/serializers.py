@@ -4,7 +4,7 @@ from better_profanity import profanity
 from rest_framework import serializers
 
 from apps.user.models import UserProfile, UserPreference
-from common.enums.errors import (
+from base.enums.errors import (
     E008_NICKNAME_CONTAINS_FORBIDDEN_WORD,
     E008_INVALID_NICKNAME_LENGTH,
     E008_INVALID_NICKNAME_SPACING,

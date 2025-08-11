@@ -1,0 +1,86 @@
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import mixins, viewsets, exceptions
+from rest_framework.filters import OrderingFilter
+from rest_framework.pagination import CursorPagination
+
+from apps.{{ app_name }}.models import {{ camel_case_app_name }}
+from apps.{{ app_name }}.v1.filters import {{ camel_case_app_name }}Filter
+from apps.{{ app_name }}.v1.permissions import {{ camel_case_app_name }}Permission
+from apps.{{ app_name }}.v1.serializers import {{ camel_case_app_name }}Serializer
+
+
+@extend_schema_view(
+    list=extend_schema(summary="{{ camel_case_app_name }} 목록 조회"),
+    create=extend_schema(summary="{{ camel_case_app_name }} 등록"),
+    retrieve=extend_schema(summary="{{ camel_case_app_name }} 상세 조회"),
+    update=extend_schema(summary="{{ camel_case_app_name }} 수정"),
+    partial_update=extend_schema(exclude=True),
+    destroy=extend_schema(summary="{{ camel_case_app_name }} 삭제"),
+)
+class {{ camel_case_app_name }}ViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = {{ camel_case_app_name }}.objects.all()
+    serializer_class = {{ camel_case_app_name }}Serializer
+    permission_classes = [{{ camel_case_app_name }}Permission]
+    pagination_class = CursorPagination
+    filterset_class = {{ camel_case_app_name }}Filter
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ["created_at"]
+    ordering = ["-created_at"]
+    filter_fields = ["id"]
+    serializer_classes_map = {
+        "list": {{ camel_case_app_name }}ListSerializer,
+        "retrieve": {{ camel_case_app_name }}RetrieveSerializer,
+        "create": {{ camel_case_app_name }}CreateSerializer,
+        "update": {{ camel_case_app_name }}UpdateSerializer,
+        "partial_update": {{ camel_case_app_name }}UpdateSerializer,
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset
+
+    def get_object(self):
+        return super().get_object()
+
+    def get_permissions(self):
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action in self.serializer_classes_map:
+            return self.serializer_classes_map[self.action]
+        return super().get_serializer_class()
+
+    def perform_create(self, serializer):
+        return super().perform_create(serializer)
+
+    def perform_update(self, serializer):
+        return super().perform_update(serializer)
+
+    def perform_destroy(self, instance):
+        return super().perform_destroy(instance)
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        raise exceptions.MethodNotAllowed("PATCH")
+
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)

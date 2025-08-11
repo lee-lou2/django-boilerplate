@@ -29,7 +29,7 @@ from apps.account.v1.services import (
     EmailTemplate,
 )
 from apps.user.models import User, UserProfile, SocialUser
-from common.enums.errors import (
+from base.enums.errors import (
     E003_EMAIL_NOT_VERIFIED,
     E003_REFRESH_TOKEN_FAILED,
     E003_INVALID_PASSWORD,

@@ -34,7 +34,7 @@ from apps.feed.v1.serializers import (
 )
 from apps.feed.v1.views import FeedCommentViewSet
 from apps.user.models import User, UserProfile
-from common.enums.errors import (
+from base.enums.errors import (
     E006_FEED_ALREADY_REPORTED,
     E006_COMMENT_ALREADY_REPORTED,
 )

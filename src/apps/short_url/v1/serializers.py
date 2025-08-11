@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from apps.short_url.models import ShortUrl, ShortUrlVisit
 from apps.short_url.v1.utils import generate_random_key, id_to_key
-from common.enums.errors import (
+from base.enums.errors import (
     E005_HASHED_VALUE_ALREADY_EXISTS,
     E005_INVALID_OG_TAG_FORMAT,
 )

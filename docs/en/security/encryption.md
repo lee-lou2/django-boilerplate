@@ -42,7 +42,8 @@ USER_ENCRYPTION_KEY = 'set_a_very_secure_32_character_secret_key'
 
 ```python
 from django.db import models
-from common.fields import EncryptedCharField
+from base.fields import EncryptedCharField
+
 
 class Customer(models.Model):
     name = models.CharField(max_length=100)
@@ -50,7 +51,7 @@ class Customer(models.Model):
     # Use encryption fields for sensitive information
     social_security_number = EncryptedCharField(max_length=255)
     credit_card = EncryptedCharField(max_length=255)
-    
+
     def __str__(self):
         return self.name
 ```
@@ -107,7 +108,7 @@ class PaymentEncryptedField(EncryptedCharField):
 Utility functions for encrypting/decrypting arbitrary data outside of database models:
 
 ```python
-# common/utils/encryption.py
+# base/utils/encryption.py
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from django.conf import settings
@@ -152,7 +153,7 @@ def decrypt_data(encrypted_data, key=None):
 Utility functions for partially masking sensitive information:
 
 ```python
-# common/utils/masking.py
+# base/utils/masking.py
 
 def mask_credit_card(card_number):
     """Masks credit card number. (e.g., **** **** **** 1234)"""

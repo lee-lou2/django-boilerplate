@@ -1,0 +1,8 @@
+from django.db import models
+
+
+class {{ camel_case_app_name }}(models.Model):
+    class Meta:
+        db_table = "{{ app_name }}"
+        verbose_name = "{{ camel_case_app_name }}"
+        verbose_name_plural = verbose_name
