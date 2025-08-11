@@ -1,3 +1,10 @@
+from django.contrib import messages
+from django.contrib.auth import get_user_model, login
+from django.contrib.auth.tokens import default_token_generator
+from django.shortcuts import render, redirect
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from django_otp.plugins.otp_totp.models import TOTPDevice
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, mixins, exceptions
 from rest_framework.generics import get_object_or_404
@@ -8,6 +15,8 @@ from apps.user.v1.serializers import (
     UserProfileSerializer,
     UserPreferenceSerializer,
 )
+
+User = get_user_model()
 
 
 class UserProfileViewSet(
@@ -124,3 +133,56 @@ class UserPreferenceViewSet(
     def partial_update(self, request, *args, **kwargs):
         kwargs["partial"] = True
         return super().update(request, *args, **kwargs)
+
+
+def setup_otp_view(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return render(
+            request, "otp/error.html", {"message": "유효하지 않은 링크입니다."}
+        )
+
+    device = TOTPDevice.objects.filter(user=user).first()
+
+    # 디바이스 존재 여부 확인
+    if not device:
+        device = TOTPDevice.objects.create(
+            user=user,
+            confirmed=False,
+            name=f"otp_{user.pk}",
+        )
+
+    # 이미 설정된 디바이스인지 확인
+    if device.confirmed:
+        return render(request, "otp/otp_already_set.html")
+
+    # 설정되지 않은 경우 설정
+    if request.method == "GET":
+        login(request, user)
+        return render(request, "otp/setup_otp.html", {"config_url": device.config_url})
+
+    # 사용자 검증 토큰 일치 여부 확인
+    user.last_login = None
+    if not default_token_generator.check_token(user, token):
+        return render(request, "otp/invalid_link.html")
+
+    # OTP 토큰 일치 여부 확인
+    otp_token = request.POST.get("otp_token")
+    is_valid = device.verify_token(otp_token)
+    if not is_valid:
+        messages.error(
+            request,
+            "OTP 코드가 올바르지 않습니다. 시간을 확인하거나 코드를 다시 입력해주세요.",
+        )
+        return render(request, "otp/setup_otp.html")
+
+    # OTP 설정 완료
+    device.confirmed = True
+    device.save()
+    user.is_verified = True
+    user.is_staff = True
+    user.save()
+    messages.success(request, "OTP 설정이 완료되었습니다.")
+    return redirect("admin:index")

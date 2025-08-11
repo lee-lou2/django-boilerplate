@@ -46,6 +46,13 @@ DEBUG = os.environ.get("DEBUG") == "True"
 # 허용 호스트
 ALLOWED_HOSTS = ["*"]
 INTERNAL_IPS = ["127.0.0.1"]
+CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
 
 # 로컬 앱 추가
 LOCAL_APPS = [
@@ -58,10 +65,14 @@ LOCAL_APPS = [
     "apps.agreement",
     "apps.cms",
     "apps.game",
+    # "apps.notification",
 ]
 
 # 외부 앱 추가
 THIRD_PARTY_APPS = [
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
@@ -70,6 +81,8 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "debug_toolbar",
     "rest_framework_simplejwt.token_blacklist",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
 ]
 
 # 기본 앱 추가
@@ -94,6 +107,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_otp.middleware.OTPMiddleware",  # OTP Middleware
     "django_hosts.middleware.HostsRequestMiddleware",  # 호스트 분리
     "debug_toolbar.middleware.DebugToolbarMiddleware",  # 디버깅을 위한 도구
     "whitenoise.middleware.WhiteNoiseMiddleware",  # Static 서버 없이 파일 처리
@@ -164,7 +178,7 @@ AUTH_USER_MODEL = "user.User"  # 기본 유저 모델
 # EMAIL
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # 이메일 백엔드
 EMAIL_HOST = os.environ.get("EMAIL_HOST")  # 이메일 호스트
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT"))  # 이메일 포트
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT") or 587)  # 이메일 포트
 EMAIL_USE_TLS = True  # TLS 사용 여부
 EMAIL_USE_SSL = False  # SSL 사용 여부
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")  # 이메일 호스트 유저
@@ -183,6 +197,7 @@ APPEND_SLASH = False  # 슬래시 추가 여부
 
 # STATIC
 STATIC_URL = "/static/"  # 정적 파일 URL
+STATICFILES_DIRS = [BASE_DIR / "static"]  # 기존 정적 파일 폴더
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # 정적 파일 루트
 STATICFILES_STORAGE = (
     "whitenoise.storage.CompressedManifestStaticFilesStorage"  # 정적 파일 저장소
@@ -241,6 +256,19 @@ REST_FRAMEWORK = {
     },
 }
 
+# UNFOLD
+UNFOLD = {
+    "SITE_TITLE": "Django Boilerplate",
+    "SITE_HEADER": "Django Boilerplate",
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+    },
+    "SCRIPTS": [
+        # 스크립트 추가
+        # lambda request: "/static/js/fcm.js"
+    ],
+}
 
 # SIMPLE JWT 설정
 SIMPLE_JWT = {

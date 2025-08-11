@@ -1,0 +1,161 @@
+{% load i18n %}
+
+{% block extrahead %}
+    <style>
+        .otp-container {
+            max-width: 450px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .otp-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 2rem;
+        }
+
+        .qr-container {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .instruction-text {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 1px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: #2563eb;
+        }
+
+        .message {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .message.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .message.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        @media (max-width: 768px) {
+            .otp-container {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="otp-container">
+        <h1 class="otp-title">{% translate 'Set up your OTP' %}</h1>
+
+        <div class="qr-container">
+            <p class="instruction-text">{% translate 'Scan the QR code with your authenticator app' %}</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ config_url }}"
+                 alt="QR Code">
+        </div>
+
+        <p class="instruction-text">{% translate 'Enter the 6-digit code from your app' %}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="otp_token" class="form-label">{% translate 'OTP Token' %}</label>
+                <input type="text"
+                       name="otp_token"
+                       id="otp_token"
+                       class="form-input"
+                       placeholder="000000"
+                       maxlength="6"
+                       pattern="[0-9]{6}"
+                       autocomplete="one-time-code"
+                       required>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                {% translate 'Verify and Complete Setup' %}
+            </button>
+        </form>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const otpInput = document.getElementById('otp_token');
+            otpInput.focus();
+
+            otpInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+            });
+        });
+    </script>
+{% endblock %}

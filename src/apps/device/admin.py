@@ -27,7 +27,7 @@ class DeviceAdmin(admin.ModelAdmin):
         "push_token_count",
     ]
     list_filter = ["created_at", "updated_at"]
-    search_fields = ["uuid", "user__username", "user__email"]
+    search_fields = ["uuid", "user__email"]
     readonly_fields = ["created_at", "updated_at"]
     raw_id_fields = ["user"]
     inlines = [PushTokenInline]
@@ -72,7 +72,6 @@ class PushTokenAdmin(admin.ModelAdmin):
     search_fields = [
         "token",
         "device__uuid",
-        "device__user__username",
         "device__user__email",
     ]
     readonly_fields = ["created_at", "updated_at"]

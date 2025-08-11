@@ -30,15 +30,23 @@ if settings.DEBUG:
 
 # 로컬 환경에서만 admin 페이지 접근 가능
 if settings.DJANGO_ENVIRONMENT == DjangoEnvironment.LOCAL.value:
+    from apps.user.v1 import views as user_views
+
+    from apps.user.forms import OTPAuthenticationForm
+
+    admin.site.login_form = OTPAuthenticationForm
+
     urlpatterns += [
         path("admin/", admin.site.urls),
+        path(
+            "setup-otp/<uidb64>/<token>/", user_views.setup_otp_view, name="setup_otp"
+        ),
     ]
 
 # 로컬, 개발, 스테이지 환경에서만 API 문서 접근 가능
 if settings.DJANGO_ENVIRONMENT in [
     DjangoEnvironment.LOCAL.value,
     DjangoEnvironment.DEVELOP.value,
-    DjangoEnvironment.STAGE.value,
 ]:
     urlpatterns += [
         path(

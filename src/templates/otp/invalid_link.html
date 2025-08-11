@@ -1,0 +1,95 @@
+{% load i18n %}
+
+{% block extrahead %}
+    <style>
+        .otp-container {
+            max-width: 450px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .otp-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1.5rem;
+        }
+
+        .error-container {
+            background: #fef2f2;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid #fecaca;
+        }
+
+        .error-text {
+            color: #6b7280;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .login-btn {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            margin-top: 1.5rem;
+        }
+
+        .login-btn:hover {
+            background: #2563eb;
+            text-decoration: none;
+            color: white;
+        }
+
+        .error-icon {
+            width: 48px;
+            height: 48px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .otp-container {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="otp-container">
+        <div class="error-icon">
+            ⚠
+        </div>
+
+        <h1 class="otp-title">{% translate 'Invalid or Expired Link' %}</h1>
+
+        <div class="error-container">
+            <p class="error-text">{% translate 'The link you followed is either invalid or has expired. Please contact the administrator.' %}</p>
+        </div>
+
+        <a href="{% url 'admin:index' %}" class="login-btn">
+            {% translate 'Go to Login' %}
+        </a>
+    </div>
+{% endblock %}
