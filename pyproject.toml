@@ -2,6 +2,7 @@
 name = "django-boilerplate"
 version = "0.1.0"
 dependencies = [
+    "better-profanity>=0.7.0",
     "black>=25.1.0",
     "boto3>=1.40.6",
     "celery>=5.5.3",
@@ -18,12 +19,15 @@ dependencies = [
     "drf-spectacular>=0.28.0",
     "freezegun>=1.5.5",
     "google-auth>=2.40.3",
+    "google-auth-oauthlib>=1.2.2",
     "gunicorn>=23.0.0",
     "psycopg2-binary>=2.9.10",
+    "pycryptodome>=3.23.0",
     "python-dotenv>=1.1.1",
     "pytz>=2025.2",
     "requests>=2.32.4",
     "sentry-sdk>=2.34.1",
+    "uuid7>=0.1.0",
     "whitenoise>=6.9.0",
 ]
 
