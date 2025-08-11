@@ -234,6 +234,12 @@ app_name/
 - 코드 품질 관리 (linting, formatting)
 - 깃 브랜치 전략 ([자체 브랜치 전략](https://lee-lou2.notion.site/Git-Branch-78a65eecaa2d4070ad19221681a96a00?pvs=4))
 
+## 📸 스크린샷
+
+### 백오피스
+![backoffice_login.png](docs/files/backoffice_login.png)
+![backoffice_dashboard.png](docs/files/backoffice_dashboard.png)
+
 ## 🧪 테스트
 
 ```bash

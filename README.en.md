@@ -234,6 +234,12 @@ app_name/
 - Code quality management (linting, formatting)
 - Git branch strategy ([Custom branch strategy](https://lee-lou2.notion.site/Git-Branch-78a65eecaa2d4070ad19221681a96a00?pvs=4))
 
+## 📸 Screenshots
+
+### Backoffice
+![backoffice_login.png](docs/files/backoffice_login.png)
+![backoffice_dashboard.png](docs/files/backoffice_dashboard.png)
+
 ## 🧪 Testing
 
 ```bash

@@ -1,3 +1,4 @@
+import qrcode
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -5,6 +6,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils import timezone
+from django_otp.plugins.otp_totp.models import TOTPDevice
 from uuid_extensions import uuid7
 
 from common.fields.encrypt import EncryptedCharField
@@ -25,16 +27,44 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields) -> "User":
-        """슈퍼 사용자 생성"""
+        """Create superuser"""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
-        if extra_fields.get("is_staff") is not True:
+        if extra_fields.get("is_staff") is False:
             raise ValueError("required is_staff=True")
-        if extra_fields.get("is_superuser") is not True:
+        if extra_fields.get("is_superuser") is False:
             raise ValueError("required is_superuser=True")
 
-        return self.create_user(email, password, **extra_fields)
+        user = self.create_user(email, password, **extra_fields)
+
+        # TOTP 디바이스 생성
+        totp_device = TOTPDevice.objects.create(
+            user=user, name=f"{user.email}_totp", confirmed=True
+        )
+
+        # QR 코드 생성 및 콘솔 출력
+        provisioning_uri = totp_device.config_url
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(provisioning_uri)
+        qr.make(fit=True)
+
+        # 콘솔에 QR 코드를 ASCII 아트로 출력
+        print("\n" + "=" * 50)
+        print(f"TOTP QR Code for superuser: {user.email}")
+        print("=" * 50)
+        qr.print_ascii(invert=True)
+        print("=" * 50)
+        print(f"Manual entry key: {totp_device.key}")
+        print(f"Provisioning URI: {provisioning_uri}")
+        print("=" * 50 + "\n")
+
+        return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):

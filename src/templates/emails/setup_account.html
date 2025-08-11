@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>백오피스 계정 설정 안내</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            background-color: #f9fafb;
+            padding: 20px;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .greeting {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+        }
+
+        .message {
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            color: #4b5563;
+        }
+
+        .cta-container {
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .info-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .info-text {
+            color: #1e40af;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .steps {
+            margin: 2rem 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .step-text {
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+
+        .footer {
+            background: #f9fafb;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .footer-text {
+            color: #6b7280;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .link-fallback {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+            word-break: break-all;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .header, .content {
+                padding: 1.5rem;
+            }
+
+            .cta-button {
+                padding: 0.875rem 2rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🔐 백오피스</h1>
+            <p>계정 설정 및 보안 인증 안내</p>
+        </div>
+
+        <div class="content">
+            <div class="greeting">
+                안녕하세요, {{ user.email }}님!
+            </div>
+
+            <div class="message">
+                백오피스에 오신 것을 환영합니다! 귀하의 계정이 성공적으로 생성되었으며,
+                보안을 위해 2단계 인증(OTP) 설정이 필요합니다.
+            </div>
+
+            <div class="info-box">
+                <div class="info-title">🛡️ 보안 인증이 필요한 이유</div>
+                <div class="info-text">
+                    OTP(One-Time Password) 인증은 귀하의 계정을 해킹이나 무단 접근으로부터 보호하는
+                    중요한 보안 기능입니다. 설정 후에는 로그인 시 휴대폰 앱에서 생성되는 6자리 코드가 필요합니다.
+                </div>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">아래 버튼을 클릭하여 계정 설정 페이지로 이동</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Google Authenticator 또는 유사 앱으로 QR 코드 스캔</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">앱에서 생성된 6자리 코드를 입력하여 인증 완료</div>
+                </div>
+            </div>
+
+            <div class="cta-container">
+                <a href="{{ setup_url }}" class="cta-button">
+                    계정 설정 시작하기
+                </a>
+            </div>
+
+            <div class="info-box">
+                <div class="info-title">⚠️ 중요 안내사항</div>
+                <div class="info-text">
+                    • 이 링크는 보안을 위해 <strong>24시간 후 만료</strong>됩니다<br>
+                    • 링크가 작동하지 않거나 만료된 경우 관리자에게 문의해주세요<br>
+                    • 이 이메일을 다른 사람과 공유하지 마세요
+                </div>
+            </div>
+
+            <div class="link-fallback">
+                <strong>링크가 클릭되지 않는 경우:</strong><br>
+                아래 주소를 복사하여 브라우저 주소창에 붙여넣어 주세요:<br>
+                {{ setup_url }}
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-text">
+                문의사항이 있으시면 시스템 관리자에게 연락해주세요.<br>
+                본 메일은 발신 전용이므로 회신하지 마세요.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
