@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.device.models import Device, PushToken
-from common.enums.errors import (
+from base.enums.errors import (
     E007_DEVICE_UUID_REQUIRED,
     E007_DEVICE_ALREADY_REGISTERED,
     E007_PUSH_TOKEN_REQUIRED,

@@ -50,6 +50,7 @@ class UserAdmin(BaseUserAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         if not change:
+            # 신규 사용자 생성 시 OTP 설정 페이지를 전송
             self.send_setup_email(request, obj)
 
     def send_setup_email(self, request, user):

@@ -9,7 +9,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
-from common.enums.base import DjangoEnvironment
+from base.enums.base import DjangoEnvironment
 
 urlpatterns = [
     path("v1/", include("apps.account.v1.urls")),

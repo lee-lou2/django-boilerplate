@@ -37,7 +37,7 @@
 ### 유틸리티
 - [x] 숏링크 생성 및 관리
 - [ ] 통계 및 분석
-- [ ] 어드민 대시보드
+- [x] 어드민 대시보드
 - [x] API 버전 관리
 
 ### 인프라
@@ -127,7 +127,7 @@ django-boilerplate/
 │   │   ├── game/              # 게임
 │   │   ├── short_url/         # 숏링크 관리
 │   │   └── user/              # 사용자 관리
-│   ├── common/                # 공통 모듈
+│   ├── base/                  # 공통 모듈
 │   │   ├── enums              # 열거형
 │   │   ├── utils              # 공통 유틸
 │   │   └── fields             # 필드 클래스
@@ -154,14 +154,12 @@ django-boilerplate/
 │   ├── static/                # 정적 파일
 │   ├── templates/             # 템플릿 파일
 │   ├── .env.emample           # 환경 변수 예제
+│   ├── Makefile               # 명령어 파일
 │   └── manage.py              # Django 관리 명령어
 ├── docs/                      # 문서
+│   ├── files/                 # 파일
 │   ├── ko/                    # 한국어 문서
 │   └── en/                    # 영어 문서
-├── docker/                    # Docker 관련 파일
-│   ├── nginx/                 # Nginx 설정
-│   ├── postgres/              # PostgreSQL 설정
-│   └── redis/                 # Redis 설정
 ├── docker-compose.yml         # Docker Compose 설정
 ├── Dockerfile                 # Docker 이미지 설정
 ├── pyproject.toml             # 프로젝트 설정 및 의존성 관리 (uv)

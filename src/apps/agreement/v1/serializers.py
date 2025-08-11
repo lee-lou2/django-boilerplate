@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.agreement.models import Agreement, UserAgreement, UserAgreementHistory
-from common.enums.errors import (
+from base.enums.errors import (
     E009_AGREEMENT_ID_REQUIRED,
     E009_AGREEMENT_NOT_FOUND,
     E009_AGREEMENT_REQUIRED,

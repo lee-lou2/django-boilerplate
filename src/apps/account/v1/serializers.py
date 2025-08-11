@@ -20,7 +20,7 @@ from apps.account.v1.services import (
     EmailTemplate,
 )
 from apps.user.models import User
-from common.enums.errors import (
+from base.enums.errors import (
     E001_INVALID_EMAIL_FORMAT,
     E001_EMAIL_NOT_VERIFIED,
     E001_EMAIL_ALREADY_IN_USE,

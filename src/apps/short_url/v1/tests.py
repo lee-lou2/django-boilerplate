@@ -9,7 +9,7 @@ from apps.short_url.models import ShortUrl
 from apps.short_url.v1.serializers import ShortUrlSerializer
 from apps.short_url.v1.utils import id_to_key, key_to_id
 from apps.user.models import User
-from common.enums.errors import E005_HASHED_VALUE_ALREADY_EXISTS
+from base.enums.errors import E005_HASHED_VALUE_ALREADY_EXISTS
 
 
 class ShortUrlSerializerTestCase(TestCase):

@@ -9,7 +9,7 @@ from django.utils import timezone
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from uuid_extensions import uuid7
 
-from common.fields.encrypt import EncryptedCharField
+from base.fields.encrypt import EncryptedCharField
 
 
 class UserManager(BaseUserManager):
@@ -44,6 +44,10 @@ class UserManager(BaseUserManager):
         )
 
         # QR 코드 생성 및 콘솔 출력
+        # [Why]
+        # Q. 왜 콘솔에 QR 코드를 출력하는가?
+        # A. 어드민 페이지 로그인 시 OTP 필요
+        #    슈퍼 사용자의 경우 QR 코드를 UI상으로 발급 받을 수 없기 때문
         provisioning_uri = totp_device.config_url
         qr = qrcode.QRCode(
             version=1,

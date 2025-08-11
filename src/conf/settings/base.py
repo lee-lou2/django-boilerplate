@@ -5,7 +5,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from common.enums.base import DjangoEnvironment
+from base.enums.base import DjangoEnvironment
 from conf.utils import load_aws_parameters
 
 # 파이썬 버전 확인
@@ -65,7 +65,7 @@ LOCAL_APPS = [
     "apps.agreement",
     "apps.cms",
     "apps.game",
-    # "apps.notification",
+    "apps.common",
 ]
 
 # 외부 앱 추가

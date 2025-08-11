@@ -42,7 +42,8 @@ USER_ENCRYPTION_KEY = '32글자의_매우_안전한_비밀_키_설정하세요'
 
 ```python
 from django.db import models
-from common.fields import EncryptedCharField
+from base.fields import EncryptedCharField
+
 
 class Customer(models.Model):
     name = models.CharField(max_length=100)
@@ -50,7 +51,7 @@ class Customer(models.Model):
     # 민감한 정보는 암호화 필드 사용
     social_security_number = EncryptedCharField(max_length=255)
     credit_card = EncryptedCharField(max_length=255)
-    
+
     def __str__(self):
         return self.name
 ```
@@ -107,7 +108,7 @@ class PaymentEncryptedField(EncryptedCharField):
 데이터베이스 모델과 별개로 임의의 데이터를 암호화/복호화해야 할 경우 사용할 수 있는 유틸리티 함수들입니다.
 
 ```python
-# common/utils/encryption.py
+# base/utils/encryption.py
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from django.conf import settings
@@ -152,7 +153,7 @@ def decrypt_data(encrypted_data, key=None):
 민감한 정보를 부분적으로 마스킹하기 위한 유틸리티 함수:
 
 ```python
-# common/utils/masking.py
+# base/utils/masking.py
 
 def mask_credit_card(card_number):
     """신용카드 번호를 마스킹합니다. (예: **** **** **** 1234)"""
