@@ -81,7 +81,7 @@ class UserProfileSerializerTests(APITestCase):
         self.assertIn("nickname", serializer.errors)
         self.assertEqual(
             serializer.errors["nickname"][0],
-            "이 필드의 글자 수가 30 이하인지 확인하십시오.",
+            "이 필드의 글자 수가 30 이하인지 확인하세요.",
         )
 
     def test_실패__닉네임에_연속_공백이_있어서_실패(self):
