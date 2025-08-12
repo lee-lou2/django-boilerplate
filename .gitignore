@@ -8,3 +8,5 @@ src/logs
 .env
 
 db.sqlite3
+
+.kiro

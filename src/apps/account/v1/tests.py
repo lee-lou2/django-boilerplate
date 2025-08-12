@@ -74,7 +74,7 @@ class RegisterSerializerTest(TestCase):
             self.assertFalse(serializer.is_valid())
             self.assertIn("email", serializer.errors)
             self.assertEqual(
-                serializer.errors["email"][0], "유효한 이메일 주소를 입력하십시오."
+                serializer.errors["email"][0], "유효한 이메일 주소를 입력하세요."
             )
 
     def test_실패__이메일_중복_미인증(self):
@@ -595,7 +595,7 @@ class RegisterViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("email", response.data)
         self.assertEqual(
-            response.data["email"][0]["message"], "유효한 이메일 주소를 입력하십시오."
+            response.data["email"][0]["message"], "유효한 이메일 주소를 입력하세요."
         )
         self.assertEqual(response.data["email"][0]["error_code"], "E0000000")
 
@@ -1039,7 +1039,7 @@ class PasswordResetSerializerTest(TestCase):
         self.assertIn("email", serializer.errors)
         self.assertEqual(
             serializer.errors["email"][0],
-            "유효한 이메일 주소를 입력하십시오.",
+            "유효한 이메일 주소를 입력하세요.",
         )
 
     def test_실패__존재하지_않는_이메일(self):
