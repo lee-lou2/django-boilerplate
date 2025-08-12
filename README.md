@@ -8,7 +8,7 @@
 ![Celery](https://img.shields.io/badge/Celery-5.2%2B-orange)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
-실제 프로덕션 환경에서 바로 사용할 수 있는 엔터프라이즈급 Django 보일러플레이트입니다. 사용자 관리, 컨텐츠 생성, 소셜 기능, 알림 시스템 등 현대적인 웹 서비스에 필수적인 모든 기능이 구현되어 있습니다.
+실제 프로덕션 환경을 목표로 설계된 엔터프라이즈급 Django 보일러플레이트입니다. 강력한 인증/보안, API 버저닝, 캐싱, 비동기 처리, 문서화, 관측성까지 기본 제공하여 바로 제품 개발에 착수할 수 있습니다.
 
 ## 🌟 주요 기능
 
@@ -45,7 +45,7 @@
 - [ ] 검색 최적화 (Elasticsearch)
 - [x] 캐시 관리 (Redis, Memcached)
 - [ ] 미디어 저장소 (AWS S3)
-- [x] 로깅 및 모니터링
+- [x] 로깅 및 모니터링 (Sentry, 구조화 로그)
 
 ## 🚀 시작하기
 
@@ -53,6 +53,8 @@
 
 - Python 3.11+
 - Django 5.1+
+- Redis (로컬 개발 시 docker-compose로 자동 제공)
+- PostgreSQL (로컬 개발 시 docker-compose로 자동 제공)
 
 ### 설치
 
@@ -82,9 +84,27 @@ cp .env.example .env
 # 마이그레이션 실행
 uv run python manage.py migrate
 
+# 관리자 계정 생성 (선택)
+uv run python manage.py createsuperuser
+
 # 개발 서버 실행
 uv run python manage.py runserver
 ```
+
+### Docker로 실행
+
+```bash
+# 루트 디렉토리에서 실행
+docker compose up -d --build
+
+# 웹 접속: http://localhost:8000
+# API 헬스체크: http://localhost:8000/_health/
+```
+
+### Celery 실행
+
+- 로컬(uv): `uv run celery -A conf.celery.app worker -l info`
+- Docker: `docker compose up -d worker`
 
 ## 📚 문서
 
@@ -111,6 +131,34 @@ uv run python manage.py runserver
 - [CI/CD 파이프라인](./docs/ko/deploy/ci-cd.md) (준비 중)
 
 
+## 🔧 환경 구성
+
+다음 환경을 지원합니다. `DJANGO_SETTINGS_MODULE`로 전환합니다.
+
+- 로컬: `conf.settings.local`
+- 개발: `conf.settings.develop`
+- 스테이지: `conf.settings.stage`
+- 운영: `conf.settings.prod`
+
+주요 환경 변수 (.env):
+
+- 필수
+  - `SECRET_KEY`: Django 시크릿 키
+  - `DJANGO_SETTINGS_MODULE`: 예) `conf.settings.local` 또는 `conf.settings.develop`
+  - `DEBUG`: `True`/`False`
+- 데이터베이스(PostgreSQL; develop/stage/prod 권장)
+  - `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, `POSTGRES_PORT`
+  - `POSTGRES_REPLICA_HOST`, `POSTGRES_REPLICA_PORT` (선택)
+- 이메일
+  - `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`
+- Sentry
+  - `SENTRY_DSN`
+- AWS/스토리지(선택)
+  - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION_NAME`
+- 회원가입/패스워드 관련 URL
+  - `SIGNUP_CONFIRM_URL`, `RESET_PASSWORD_URL`, `SIGNUP_COMPLETED_URL`
+
+
 ## 📂 프로젝트 구조
 
 ```
@@ -134,13 +182,14 @@ django-boilerplate/
 │   ├── conf/                  # 프로젝트 설정
 │   │   ├── settings/          # 환경별 설정
 │   │   │   ├── base.py        # 기본 설정
-│   │   │   ├── dev.py         # 개발 환경
-│   │   │   ├── test.py        # 테스트 환경
+│   │   │   ├── local.py       # 로컬 환경
+│   │   │   ├── develop.py     # 개발 환경
+│   │   │   ├── stage.py       # 스테이지 환경
 │   │   │   └── prod.py        # 운영 환경
 │   │   ├── urls/              # URL 설정
 │   │   │   ├── admin.py       # 관리자 URL 설정
 │   │   │   ├── api.py         # API URL 설정
-│   │   │   └── url.py         # URL Shorter 설정
+│   │   │   └── url.py         # URL Shortener 설정
 │   │   ├── authentications.py # 인증 설정
 │   │   ├── caches.py          # 캐시 설정
 │   │   ├── celery.py          # Celery 설정
@@ -153,7 +202,7 @@ django-boilerplate/
 │   │   └── wsgi.py            # WSGI 설정
 │   ├── static/                # 정적 파일
 │   ├── templates/             # 템플릿 파일
-│   ├── .env.emample           # 환경 변수 예제
+│   ├── .env.example           # 환경 변수 예제
 │   ├── Makefile               # 명령어 파일
 │   └── manage.py              # Django 관리 명령어
 ├── docs/                      # 문서
@@ -196,7 +245,7 @@ app_name/
 - Django 5.1+: 웹 프레임워크
 - Django REST Framework 3.15+: API 개발
 - Celery 5.2+: 비동기 작업 처리
-- Sentry: 오류 모니터링
+- Sentry: 오류/트레이싱 모니터링
 - JWT: 인증
 
 ### 인프라
@@ -206,6 +255,13 @@ app_name/
 - GitHub Actions: CI/CD
 - AWS: 클라우드 호스팅
 
+### 운영/옵저버빌리티
+- drf-spectacular: OpenAPI/Swagger 문서화
+- django-hosts: 서브도메인/호스트 분리
+- django-otp: 2FA(관리자)
+- debug-toolbar: 로컬 디버깅
+- WhiteNoise: 정적 파일 서빙
+
 ## 📈 성능 최적화
 
 - 데이터베이스 쿼리 최적화
@@ -213,6 +269,7 @@ app_name/
 - Celery를 이용한 비동기 작업 처리
 - 대용량 파일 처리를 위한 청크 업로드
 - 페이지네이션 및 필터링 최적화
+ - 읽기/쓰기 분리(DB 라우터, replica 설정)
 
 ## 🔒 보안
 
@@ -223,6 +280,19 @@ app_name/
 - 데이터 암호화
 - OAuth2 보안 설정
 - 환경 변수를 통한 민감 정보 관리
+ - 2단계 인증(django-otp, 관리 사이트)
+ - AWS SSM Parameter Store 연동(선택; 운영 시 외부 비밀 관리)
+
+## 📑 API 문서 및 엔드포인트
+
+- OpenAPI JSON: `/openapi.json/` (로컬/개발 환경)
+- Swagger UI: `/swagger/` (로컬/개발 환경)
+- Redoc: `/redoc/` (로컬/개발 환경)
+- 헬스체크: `/_health/`
+- API 버저닝: 모든 API는 `/v1/` 프리픽스를 사용합니다.
+
+관리자(로컬 전용): `/admin/`
+- 관리 로그인은 django-otp 기반 2FA를 사용합니다. 로컬 최초 로그인 시 발급된 URL로 OTP를 설정합니다.
 
 ## 📝 개발 가이드라인
 
@@ -234,7 +304,7 @@ app_name/
 
 ## 📸 스크린샷
 
-### 백오피스
+### 어드민 페이지
 ![backoffice_login.png](docs/files/backoffice_login.png)
 ![backoffice_dashboard.png](docs/files/backoffice_dashboard.png)
 
@@ -242,11 +312,49 @@ app_name/
 
 ```bash
 # 모든 테스트 실행
-python manage.py test
+uv run python manage.py test
 
 # 특정 앱 테스트
-python manage.py test apps.account
+uv run python manage.py test apps.account
 ```
+
+## 🧰 Makefile 사용법
+
+`src/Makefile`에 유용한 타깃들이 정의되어 있습니다.
+
+- 개발 서버: `make dev`
+- 단위 테스트: `make test`
+- 부하 테스트(헤드리스 Locust): `make load-test`
+
+부하 테스트 완료 후 `src/locust_report.html` 리포트가 생성됩니다.
+
+## 🧱 앱 템플릿으로 빠르게 스캐폴딩
+
+`apps/common`에 템플릿이 포함되어 있어, 아래 명령으로 표준화된 앱 구조를 즉시 생성할 수 있습니다.
+
+```bash
+uv run python src/manage.py startapp my_app
+```
+
+- 생성 위치: `src/apps/my_app`
+- 템플릿 경로: `apps/common/management/app_template`
+
+## ⚙️ Locust로 부하 테스트
+
+프로젝트에는 `tests/locust/locustfile.py`가 포함되어 있으며, 다음과 같이 실행할 수 있습니다.
+
+```bash
+# Makefile을 이용한 실행(권장)
+make load-test
+
+# 또는 직접 실행
+uv run python -m locust -f src/tests/locust/locustfile.py \
+  --headless -u 10 -r 5 -t 30s \
+  --host=http://127.0.0.1:8000 \
+  --html=locust_report.html
+```
+
+실행이 완료되면 `src/locust_report.html`로 결과 리포트를 확인할 수 있습니다.
 
 ## 🤝 기여하기
 
