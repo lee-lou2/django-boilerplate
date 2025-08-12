@@ -68,7 +68,7 @@ class UserAdmin(BaseUserAdmin):
         )
 
         send_mail(
-            "백오피스 계정 설정을 완료해주세요.",
+            "Django Boilerplate 계정 설정을 완료해주세요.",
             message,
             settings.DEFAULT_FROM_EMAIL,
             [user.email],
