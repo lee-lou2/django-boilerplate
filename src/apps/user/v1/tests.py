@@ -1,11 +1,9 @@
 from django.test import RequestFactory
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
 
-from apps.user.models import User, UserPreference
-from apps.user.models import UserProfile
-from apps.user.v1.serializers import UserPreferenceSerializer
-from apps.user.v1.serializers import UserProfileSerializer
+from apps.user.models import User, UserPreference, UserProfile
+from apps.user.v1.serializers import UserPreferenceSerializer, UserProfileSerializer
 
 
 class UserProfileSerializerTests(APITestCase):

@@ -33,7 +33,7 @@ class Command(TemplateCommand):
             )
             super().handle("app", app_name, target, **options)
         except CommandError:
-            self.stderr.write(f'"{app_name}" app is already exists.')
+            self.stderr.write('"%s" app is already exists.' % app_name)
 
     @staticmethod
     def _make_dirs(top_dir):

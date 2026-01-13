@@ -114,13 +114,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
-    def __str__(self):
-        return self.email
-
     class Meta:
         db_table = "user"
         verbose_name = "사용자"
         verbose_name_plural = "사용자"
+
+    def __str__(self):
+        return self.email
 
 
 class SocialUser(models.Model):

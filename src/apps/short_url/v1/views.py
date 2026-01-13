@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets, mixins, generics, permissions
+from rest_framework import generics, mixins, permissions, viewsets
 from rest_framework.generics import get_object_or_404
 
 from apps.short_url.models import ShortUrl

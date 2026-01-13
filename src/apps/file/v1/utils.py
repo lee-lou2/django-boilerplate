@@ -1,5 +1,6 @@
-import mimetypes
 import logging
+import mimetypes
+
 import boto3
 from botocore.config import Config
 from botocore.exceptions import ClientError
@@ -18,7 +19,7 @@ try:
     )
     logger.info("Successfully initialized S3 client.")
 except Exception as e:
-    logger.error(f"Error initializing S3 client: {e}", exc_info=True)
+    logger.error("Error initializing S3 client: %s", e, exc_info=True)
 
 
 def generate_upload_presigned_url(
@@ -46,7 +47,9 @@ def generate_upload_presigned_url(
     if not content_type:
         content_type = "application/octet-stream"
         logger.warning(
-            f"Could not guess Content-Type for {object_key}. Defaulting to {content_type}."
+            "Could not guess Content-Type for %s. Defaulting to %s.",
+            object_key,
+            content_type,
         )
     max_upload_size = (file_size if file_size > 0 else 100 * 1024 * 1024) + (
         10 * 1024 * 1024
@@ -67,14 +70,18 @@ def generate_upload_presigned_url(
         return response
     except ClientError as e:
         logger.error(
-            f"Error generating upload presigned URL for {object_key}: {e}",
+            "Error generating upload presigned URL for %s: %s",
+            object_key,
+            e,
             exc_info=True,
         )
         return {}
     except Exception as e:
         # 기타 예외 발생 시 로깅
         logger.error(
-            f"Unexpected error generating upload presigned URL for {object_key}: {e}",
+            "Unexpected error generating upload presigned URL for %s: %s",
+            object_key,
+            e,
             exc_info=True,
         )
         return {}
@@ -113,13 +120,17 @@ def generate_download_presigned_url(
         return response
     except ClientError as e:
         logger.error(
-            f"Error generating download presigned URL for {object_key}: {e}",
+            "Error generating download presigned URL for %s: %s",
+            object_key,
+            e,
             exc_info=True,
         )
         return {}
     except Exception as e:
         logger.error(
-            f"Unexpected error generating download presigned URL for {object_key}: {e}",
+            "Unexpected error generating download presigned URL for %s: %s",
+            object_key,
+            e,
             exc_info=True,
         )
         return {}

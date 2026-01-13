@@ -41,7 +41,7 @@ class RedisCache(DjangoRedisCache):
         """스무스한 데이터 조회 및 설정"""
         # 데이터 조회
         data = self.get(key)
-        if data is None or type(data) != dict:
+        if data is None or not isinstance(data, dict):
             data = {}
 
         # 데이터 조회

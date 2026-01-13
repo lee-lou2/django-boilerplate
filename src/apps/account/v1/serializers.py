@@ -268,16 +268,16 @@ class LogoutSerializer(serializers.Serializer):
                 if outstanding_token:
                     BlacklistedToken.objects.get_or_create(token=outstanding_token)
                     logger.info(
-                        f"Access token (jti: {jti[:8]}...) blacklisted successfully."
+                        "Access token (jti: %s...) blacklisted successfully.", jti[:8]
                     )
                 else:
-                    logger.warning(f"Outstanding token not found for jti: {jti[:8]}...")
+                    logger.warning("Outstanding token not found for jti: %s...", jti[:8])
             else:
                 logger.warning("Access token does not contain jti claim.")
         except TokenError as e:
-            logger.warning(f"Invalid access token provided in header: {e}")
+            logger.warning("Invalid access token provided in header: %s", e)
         except Exception as e:
-            logger.error(f"Error processing access token during logout: {e}")
+            logger.error("Error processing access token during logout: %s", e)
 
         # 2. 리프레시 토큰 블랙리스트 처리
         refresh_token_value = attrs["refresh_token"]
@@ -286,10 +286,11 @@ class LogoutSerializer(serializers.Serializer):
             refresh.blacklist()
         except TokenError:
             logger.warning(
-                f"Refresh token might be already blacklisted or invalid: {refresh_token_value[:10]}..."
+                "Refresh token might be already blacklisted or invalid: %s...",
+                refresh_token_value[:10],
             )
         except Exception as e:
-            logger.error(f"Error blacklisting refresh token: {e}")
+            logger.error("Error blacklisting refresh token: %s", e)
             raise exceptions.ValidationError(E003_BLACKLIST_FAILED)
         return attrs
 

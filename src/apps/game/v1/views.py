@@ -1,6 +1,6 @@
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
-from rest_framework import views, viewsets, mixins, exceptions, response
+from rest_framework import exceptions, mixins, response, views, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from apps.game.models import AttendanceCheck

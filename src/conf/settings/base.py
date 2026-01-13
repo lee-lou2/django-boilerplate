@@ -425,11 +425,9 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379")
 os.environ.setdefault("LOADED_SETTINGS", "True")
 
 # 출석 체크 정책
-ATTENDANCE_CHECK_REWARD_POINTS = list(
-    map(
-        lambda x: int(x),
-        os.environ.get("ATTENDANCE_CHECK_REWARD_POINTS", "5,5,5,10,10,10,100").split(
-            ","
-        ),
-    )
-)
+ATTENDANCE_CHECK_REWARD_POINTS = [
+    int(x)
+    for x in os.environ.get(
+        "ATTENDANCE_CHECK_REWARD_POINTS", "5,5,5,10,10,10,100"
+    ).split(",")
+]

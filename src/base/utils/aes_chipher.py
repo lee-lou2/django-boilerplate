@@ -1,7 +1,8 @@
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
 import base64
 import os
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 
 class AESCipher:
